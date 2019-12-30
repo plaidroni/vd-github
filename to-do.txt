@@ -1,0 +1,19 @@
+╔════╗╔═══╗     ╔═══╗╔═══╗
+║╔╗╔╗║║╔═╗║     ╚╗╔╗║║╔═╗║
+╚╝║║╚╝║║─║║     ─║║║║║║─║║
+──║║──║║─║║     ─║║║║║║─║║
+──║║──║╚═╝║     ╔╝╚╝║║╚═╝║
+──╚╝──╚═══╝     ╚═══╝╚═══╝
+(yeah i went on a super cool font generator website to make that)
+fuck off commies
+
+-tobias work
+1. create a AddDPPos command to save the location and angle into an sql database, have the vector dealer randomly take from that sql table and spawn at one of the locations, call the table by the map name, so if you switch maps, it will have a fresh table.
+2. find a model for the vector dealer to use, preferably in source gmod, give it effects and shit to mask that its a normal gmod model (can be done in code)
+3. either shroud his face in darkness or give him glowing eyes :)
+4. research
+
+-sevans work (prolly cancer)
+1. update ui menu, it looks like fucking garbage rn
+2. find a way to make animations in blender for character, import into gmod and put on vector dealer when player interacts
+3. maybe add vector casino again?
