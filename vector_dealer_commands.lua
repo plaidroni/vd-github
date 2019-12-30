@@ -10,4 +10,4 @@ function AddVDPos(ply)
 	v=ply.GetPos()
 	print(v)
 end
-hood.Add("KeyPress", "IN_FORWARD", AddVDPos)
+hook.Add("KeyPress", "IN_FORWARD", AddVDPos)
