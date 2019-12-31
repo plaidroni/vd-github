@@ -1,5 +1,4 @@
 include("shared.lua")
-
 LNMenu = {}
 LNMenu.Listings = {}
 LNMenu.Text = {}
