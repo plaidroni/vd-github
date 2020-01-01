@@ -1,15 +1,15 @@
 --[[---------------------------------------------------------
-   Name:	VDGetPos
+   Name:	VDSetPos
    Desc:	Allows admins to get current Pos and input into VDPos.
 -----------------------------------------------------------]]   
-local function VDGetPos( player, command)
+local function VDSetPos( player, command)
 
 	if ( !player:IsAdmin() ) then return end
 	pos={}
 	look={}
 	pos=player:GetPos()
 	look=player:GetAimVector()
-	
+	print(look)
 end
 
-concommand.Add( "VDGetPos", VDGetPos, nil, "", { FCVAR_DONTRECORD } )
+concommand.Add( "VDSetPos", VDSetPos, nil, "", { FCVAR_DONTRECORD } )
