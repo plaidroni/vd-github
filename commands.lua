@@ -5,8 +5,11 @@
 local function VDGetPos( player, command)
 
 	if ( !player:IsAdmin() ) then return end
-	v=player:GetPos()
-	print(v)
+	pos={}
+	look={}
+	pos=player:GetPos()
+	look=player:GetAimVector()
+	
 end
 
 concommand.Add( "VDGetPos", VDGetPos, nil, "", { FCVAR_DONTRECORD } )
