@@ -7,8 +7,7 @@ LNInventory = {}
 LNInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
-PosTable = {}
-AngleTable = {}
+
 
 
 -- END CONFIG
@@ -26,11 +25,9 @@ function ENT:disappear()
         if v:IsPlayer() then
             v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
                 function disappearinn()
-                    print("genisu")
-                    grabPosAngle()
-                    local randomvec = table.Random(PosTable)
-                    local veckey = table.KeyFromValue(PosTable, randomvec)
-                    local randomangle = AngleTable[veckey]
+                    PosAngTbl = grabPosAngle()
+                    local randomvec = PosAngTbl[1]
+                    local randomangle = PosAngTbl[2]
                     for g,gg in pairs(player.GetAll()) do
                         v:SetPos(randomvec)
                     end
@@ -126,26 +123,30 @@ net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
 end)
 
 function grabPosAngle()
+    posang = {}
     res = sql.QueryValue("SELECT COUNT(*) FROM VDPos;")
-    for i=1, tonumber(res) do
-        res = sql.QueryRow("SELECT Positions FROM VDPos;",i)
-        s = table.ToString(res)
-        d=string.sub(s,13,string.len(s)-3)
-        k=string.Split(d, " ")
-        y=Vector(k[1],k[2],k[3])
-        table.insert(PosTable,y)
-        res = sql.QueryRow("SELECT Angles FROM VDPos;",i)
-        s = table.ToString(res)
-        d=string.sub(s,13,string.len(s)-3)
-        k=string.Split(d, " ")
-        y=Vector(k[1],k[2],k[3])
-        table.insert(AngleTable,y)
-    end
-end
+    --incase some shit breaks
+    if not res then print(sql.LastError()) return end
+    
+    --grab random integer from 1 - max row of sql
+    rand = math.random(res)
+    --grabs pos from selected row
+    res = sql.QueryRow("SELECT Positions FROM VDPos;",rand)
+    str = table.ToString(res)
+    --trim
+    str=string.sub(str,13,string.len(str)-3)
+    --splitting to vector
+    str=string.Split(str, " ")
+    table.insert(posang,Vector(str[1],str[2],str[3]))
 
-local M ={}
-function update()
-    disappearinn()
+   
+    --grabs Angle from selected row
+    res = sql.QueryRow("SELECT Angles FROM VDPos;",rand)
+    str = table.ToString(res)
+    --trim
+    str=string.sub(str,13,string.len(str)-3)
+    --splitting to vector
+    str=string.Split(str, " ")
+    table.insert(posang,Angle(str[1],str[2],str[3]))
+    return posang
 end
-M.update = update
-return M
