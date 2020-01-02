@@ -7,9 +7,10 @@ LNInventory = {}
 LNInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
- 
- 
- 
+PosTable = {}
+AngleTable = {}
+
+
 -- END CONFIG
 
 util.AddNetworkString("vectordealer_UsePanel")
@@ -25,27 +26,11 @@ function ENT:disappear()
         if v:IsPlayer() then
             v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
                 function disappearinn()
-                    randomtable = {
-                        Vector(1216.004639, 136.028549, 120.031250)- Vector(0,0,61),
-                        Vector(1988.821167, -1978.840088, -431.968750)- Vector(0,0,61),
-                        Vector(-1012.234314, -1984.007690, -363.968750)- Vector(0,0,61),
-                        Vector(-2658.281494, -2137.575684, -431.968750)- Vector(0,0,61),
-                        Vector(-1957.099243, -645.816101, -618.971191)- Vector(0,0,61),
-                        Vector(-1743.968750, -339.423401, -391.969086)- Vector(0,0,61),
-                        Vector(-1916.279053, -2804.495117, -887.969360)- Vector(0,0,61),
-                    }
-                    randomangletable = {
-                        Angle(21.037445, 42.394558, 0.000000),
-                        Angle(5.417387, 172.384521, 0.000000),
-                        Angle(5.444870, 0.289598, 0.000000),
-                        Angle(14.712353, 57.189461, 0.000000),
-                        Angle(13.007330, -98.760818, 0.000000),
-                        Angle(5.472243, 14.209239, 0.000000),
-                        Angle(8.552035, -79.975777, 0.000000),
-                    }
-                    local randomvec = table.Random(randomtable)
-                    local veckey = table.KeyFromValue(randomtable, randomvec)
-                    local randomangle = randomangletable[veckey]
+                    print("genisu")
+                    grabPosAngle()
+                    local randomvec = table.Random(PosTable)
+                    local veckey = table.KeyFromValue(PosTable, randomvec)
+                    local randomangle = AngleTable[veckey]
                     for g,gg in pairs(player.GetAll()) do
                         v:SetPos(randomvec)
                     end
@@ -139,3 +124,28 @@ net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
     end
    
 end)
+
+function grabPosAngle()
+    res = sql.QueryValue("SELECT COUNT(*) FROM VDPos;")
+    for i=1, tonumber(res) do
+        res = sql.QueryRow("SELECT Positions FROM VDPos;",i)
+        s = table.ToString(res)
+        d=string.sub(s,13,string.len(s)-3)
+        k=string.Split(d, " ")
+        y=Vector(k[1],k[2],k[3])
+        table.insert(PosTable,y)
+        res = sql.QueryRow("SELECT Angles FROM VDPos;",i)
+        s = table.ToString(res)
+        d=string.sub(s,13,string.len(s)-3)
+        k=string.Split(d, " ")
+        y=Vector(k[1],k[2],k[3])
+        table.insert(AngleTable,y)
+    end
+end
+
+local M ={}
+function update()
+    disappearinn()
+end
+M.update = update
+return M
