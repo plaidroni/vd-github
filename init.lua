@@ -124,14 +124,14 @@ end)
 
 function grabPosAngle()
     posang = {}
-    res = sql.QueryValue("SELECT COUNT(*) FROM VDPos;")
+    res = sql.QueryValue("SELECT COUNT(*) FROM VDPos WHERE Map = '"..game.GetMap().."';")
     --incase some shit breaks
     if not res then print(sql.LastError()) return end
     
     --grab random integer from 1 - max row of sql
     rand = math.random(res)
     --grabs pos from selected row
-    res = sql.QueryRow("SELECT Positions FROM VDPos;",rand)
+    res = sql.QueryRow("SELECT Positions FROM VDPos WHERE Map = '"..game.GetMap().."';",rand)
     str = table.ToString(res)
     --trim
     str=string.sub(str,13,string.len(str)-3)
@@ -141,7 +141,7 @@ function grabPosAngle()
 
    
     --grabs Angle from selected row
-    res = sql.QueryRow("SELECT Angles FROM VDPos;",rand)
+    res = sql.QueryRow("SELECT Angles FROM VDPos WHERE Map = '"..game.GetMap().."';",rand)
     str = table.ToString(res)
     --trim
     str=string.sub(str,13,string.len(str)-3)
