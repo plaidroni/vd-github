@@ -1,0 +1,24 @@
+╔════╗╔═══╗     ╔═══╗╔═══╗
+║╔╗╔╗║║╔═╗║     ╚╗╔╗║║╔═╗║
+╚╝║║╚╝║║─║║     ─║║║║║║─║║
+──║║──║║─║║     ─║║║║║║─║║
+──║║──║╚═╝║     ╔╝╚╝║║╚═╝║
+──╚╝──╚═══╝     ╚═══╝╚═══╝
+(yeah i went on a super cool font generator website to make that)
+fuck off commies
+
+-tobias work
+1. c̶r̶e̶a̶t̶e̶ ̶a̶ ̶A̶d̶d̶D̶P̶P̶o̶s̶ ̶c̶o̶m̶m̶a̶n̶d̶ ̶t̶o̶ ̶s̶a̶v̶e̶ ̶t̶h̶e̶ ̶l̶o̶c̶a̶t̶i̶o̶n̶ ̶a̶n̶d̶ ̶a̶n̶g̶l̶e̶ ̶i̶n̶t̶o̶ ̶a̶n̶ ̶s̶q̶l̶ ̶d̶a̶t̶a̶b̶a̶s̶e̶, h̶a̶v̶e̶ ̶t̶h̶e̶ ̶v̶e̶c̶t̶o̶r̶ ̶d̶e̶a̶l̶e̶r̶ ̶r̶a̶n̶d̶o̶m̶l̶y̶ ̶t̶a̶k̶e̶ ̶f̶r̶o̶m̶ ̶t̶h̶a̶t̶ ̶s̶q̶l̶ ̶t̶a̶b̶l̶e̶ ̶a̶n̶d̶ ̶s̶p̶a̶w̶n̶ ̶a̶t̶ ̶o̶n̶e̶ ̶o̶f̶ ̶t̶h̶e̶ ̶l̶o̶c̶a̶t̶i̶o̶n̶s̶,̶ ̶c̶a̶l̶l̶ ̶t̶h̶e̶ ̶t̶a̶b̶l̶e̶ ̶b̶y̶ ̶t̶h̶e̶ ̶m̶a̶p̶ ̶n̶a̶m̶e̶,̶ ̶s̶o̶ ̶i̶f̶ ̶y̶o̶u̶ ̶s̶w̶i̶t̶c̶h̶ ̶m̶a̶p̶s̶,̶ ̶i̶t̶ ̶w̶i̶l̶l̶ ̶h̶a̶v̶e̶ ̶a̶ ̶f̶r̶e̶s̶h̶ ̶t̶a̶b̶l̶e̶.̶
+2. find a model for the vector dealer to use, preferably in source gmod, give it effects and shit to mask that its a normal gmod model (can be done in code)
+3. either shroud his face in darkness or give him glowing eyes :)
+4. research
+5. c̶a̶t̶e̶g̶o̶r̶i̶z̶e̶ ̶V̶D̶S̶e̶t̶P̶o̶s̶(̶)̶ ̶w̶i̶t̶h̶ ̶n̶a̶m̶e̶ ̶+̶ ̶m̶a̶p̶
+6. V̶D̶D̶e̶l̶e̶t̶e̶P̶o̶s̶(̶)̶ ̶b̶y̶ ̶m̶a̶p̶ ̶a̶n̶d̶ ̶n̶a̶m̶e̶
+7. 
+
+-sevans work (prolly cancer)
+1. update ui menu, it looks like fucking garbage rn
+2. find a way to make animations in blender for character, import into gmod and put on vector dealer when player interacts
+3. maybe add vector casino again?
+
+
