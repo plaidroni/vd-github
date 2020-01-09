@@ -33,7 +33,6 @@ function ENT:disappear()
                     end
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
-                    print(randomangle)
                     v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
                 end
                 timer.Simple(1,disappearinn)
@@ -145,7 +144,7 @@ function grabPosAngle()
     res = sql.QueryRow("SELECT Angles FROM VDPos WHERE Map = '"..game.GetMap().."';",rand)
     str = table.ToString(res)
     --trim
-    str=string.sub(str,13,string.len(str)-3)
+    str=string.sub(str,10,string.len(str)-3)
     --splitting to vector
     str=string.Split(str, " ")
     table.insert(posang,Angle(str[1],str[2],str[3]))
