@@ -2,23 +2,30 @@
 --[[---------------------------------------------------------
    Name:	VDSetPos
    Desc:	Allows admins to get current Pos and input into VDPos.
------------------------------------------------------------]]   
+-----------------------------------------------------------]]  
+
 local function VDSetPos( player, command, name)
 	if ( !player:IsAdmin() ) then return end
 	
+	--[[immigration = { player:GetShootPos(),
+					player:EyePos(),
+					player:EyeAngles()
+	}
+	PrintTable(immigration)]]--
+
+
 	--Gets position and look position and makes a string
 	x,y,z=player:GetPos():Unpack()
 	pos = x.." "..y.." "..z
-	x,y,z=player:GetAngles():Unpack()
+	x,y,z=player:EyeAngles():Unpack()
 	look = x.." "..y.." "..z
-
+	print(look)
 	--Checks if current map + name is already in the system
 	result = sql.Query("SELECT Name FROM VDPos WHERE Map = '"..game.GetMap().."' AND Name = '".. name[1] .."';")
 	if not result then
 		--inputs pos, look angle, name, and map into sql table
 		query = sql.Query("INSERT INTO VDPos(Positions,Angles,Name,Map) VALUES( '".. pos .."','"..look.."','"..name[1].."','"..game.GetMap().."');")
 		if not query then print(sql.LastError())end
-		print(query)
 	else print("Position already logged under that name!")
 	end
 
