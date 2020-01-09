@@ -8,7 +8,8 @@ LNInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, 
 LNInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
 model = sql.QueryValue("SELECT Model FROM VDSetModel;")
-
+game.AddParticles( "gmod_effects.pcf" )
+PrecacheParticleSystem( "generic_smoke" )
 
 -- END CONFIG
 
@@ -31,6 +32,7 @@ function ENT:disappear()
                     for g,gg in pairs(player.GetAll()) do
                         v:SetPos(randomvec)
                     end
+                    self:SetModel( model )
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
                     v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
@@ -88,15 +90,24 @@ end)
  
 function ENT:Use( Name, Caller )
     if Name:IsPlayer() then
-
-        moneyAmount = Name:getDarkRPVar("money")
+        x,y,z  = Name:GetPos():Unpack()
+     
+        z = z + 60
+        Name:Freeze(true)
+        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+      
+        Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
+        Name:Freeze(false)
+   
+        --[[moneyAmount = Name:getDarkRPVar("money")
         if moneyAmount > 50000 then
             
             net.Start("vectordealer_UsePanel")
             net.Send(Name)
         else
         self:disappear()
-        end
+        end]]
     end
 end
  
