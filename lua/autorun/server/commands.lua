@@ -11,7 +11,9 @@ local function VDSetPos( player, command, name)
 	x,y,z=player:GetPos():Unpack()
 	pos = x.." "..y.." "..z
 	x,y,z=player:EyeAngles():Unpack()
+	x=0
 	look = x.." "..y.." "..z
+
 	--Checks if current map + name is already in the system
 	result = sql.Query("SELECT Name FROM VDPos WHERE Map = '"..game.GetMap().."' AND Name = '".. name[1] .."';")
 	if not result then
@@ -40,7 +42,7 @@ local function VDDeletePos( player, command, name)
 		if query then
 			print(name[1].. " sucessfully deleted!")
 		end
-	else print("No such name and map exists!")
+	else print("No such name exists!")
 	end
 end
 
@@ -68,8 +70,108 @@ concommand.Add( "VDViewPos", VDViewPos, nil, "", {FCVAR_DONTRECORD} )
 -----------------------------------------------------------]]  
 local function VDClearPos( player, command)
 	if ( !player:IsAdmin() ) then return end
-	sql.Query("DElETE FROM VDPos;")
+	sql.Query("DELETE FROM VDPos;")
 end
 concommand.Add( "VDClearPos", VDClearPos, nil, "", {FCVAR_DONTRECORD} )
 
 
+
+
+
+
+
+
+--[[---------------------------------------------------------
+   Name:	VDAddModel
+   Desc:	Allows admins to add a model
+-----------------------------------------------------------]]  
+local function VDAddModel(player, command, model)
+	if( !player:IsAdmin()) then return end
+	query = sql.Query("INSERT INTO VDModel(Model, Name) VALUES('"..model[1].."', '"..model[2].."');")
+	if not query then print(sql.LastError())
+	else print("Success!")
+	end		
+end
+concommand.Add("VDAddModel", VDAddModel, nil, "", {FCVAR_DONTRECORD})
+
+
+--[[---------------------------------------------------------
+   Name:	VDSetModel
+   Desc:	Allows admins to clear all Pos
+-----------------------------------------------------------]]  
+local function VDSetModel( player, command, model)
+	if( !player:IsAdmin()) then return end
+	res = sql.QueryValue("SELECT Model FROM VDModel WHERE Name = '"..model[1].."';")
+	if res then
+	sql.Query("DELETE FROM VDSetModel;")
+	query = sql.Query("INSERT INTO VDSetModel(Model, Name) VALUES('"..res.."','"..model[1].."');")
+	print("Success!")
+	else print(sql.LastError()) end
+end
+concommand.Add( "VDSetModel", VDSetModel, nil, "", {FCVAR_DONTRECORD} )
+
+
+--[[---------------------------------------------------------
+   Name:	VDViewModel
+   Desc:	Allows admins to add a model
+-----------------------------------------------------------]]  
+local function VDViewModel(player, command)
+	if( !player:IsAdmin()) then return end
+	curMod = sql.QueryValue("SELECT Model FROM VDSetModel;")
+	curName = sql.QueryValue("SELECT Name FROM VDSetModel;")
+	print("		Set Name  = "..curName)
+	print("		Set Model = "..curMod)
+	res = sql.Query("SELECT Name, Model from VDModel;")
+	PrintTable(res)		
+end
+concommand.Add( "VDViewModel", VDViewModel, nil, "", {FCVAR_DONTRECORD} )
+
+
+--[[---------------------------------------------------------
+   Name:	VDClearModel
+   Desc:	Allows admins to delete all models
+-----------------------------------------------------------]]  
+local function VDClearModel(player, command)
+	if( !player:IsAdmin()) then return end
+	sql.Query("DELETE FROM VDModel;")	
+end
+concommand.Add( "VDClearModel", VDClearModel, nil, "", {FCVAR_DONTRECORD} )
+
+
+--[[---------------------------------------------------------
+   Name:	VDDeleteModel
+   Desc:	Allows admins to delete specific models
+-----------------------------------------------------------]]  
+local function VDDeleteModel(player, command, name)
+	if( !player:IsAdmin()) then return end
+	--Checks if inputted Model is in the db
+	result = sql.Query("SELECT Name FROM VDModel WHERE Name = '".. name[1] .."';")
+	if result then
+		--Deletes selected name
+		query = sql.Query("DELETE FROM VDModel WHERE Name = '".. name[1] .."';")
+		if query then
+			print(name[1].. " sucessfully deleted!")
+		end
+	else print("No such model exists!")
+	end	
+end
+concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
+
+
+--[[---------------------------------------------------------
+   Name:	VDHelp
+   Desc:	Help
+-----------------------------------------------------------]]  
+local function VDHelp( player, command)
+	print("VDSetPos String Name -- Sets the position of the Vector Dealer with look angle and position")
+	print("VDDeletePos String Name -- Deletes a specific position of the Vector Dealer")
+	print("VDViewPos -- Displays a table of all positions according to map and name")
+	print("VDClearPos -- Clears all of the positions in the table")
+	print("VDAddModel String Path, String Name -- (format as 'models/MODEL.mdl') allows the admin to set the model")
+	print("VDViewModel String Name -- displays all of the models in the DB")
+	print("VDSetModel String Name -- sets the current model in accordance to the name")
+	print("VDViewModel -- Displays currently set model and models stored")
+	print("VDClearModel -- Deletes all models from the database")
+	print("VDDeleteModel String Name -- Deletes model with specified name")
+end
+concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )

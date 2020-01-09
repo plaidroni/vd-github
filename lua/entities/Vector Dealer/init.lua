@@ -7,7 +7,7 @@ LNInventory = {}
 LNInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
 LNInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
-
+model = sql.QueryValue("SELECT Model FROM VDSetModel;")
 
 
 -- END CONFIG
@@ -40,7 +40,7 @@ function ENT:disappear()
     end 
 end
 function ENT:Initialize() 
-    self:SetModel( "models/vector_orc.mdl" )
+    self:SetModel( model )
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
     self:CapabilitiesAdd( CAP_TURN_HEAD )
     self:SetSchedule( SCHED_NPC_FREEZE )
@@ -148,5 +148,6 @@ function grabPosAngle()
     --splitting to vector
     str=string.Split(str, " ")
     table.insert(posang,Angle(str[1],str[2],str[3]))
+    model = sql.QueryValue("SELECT Model FROM VDSetModel;")
     return posang
 end
