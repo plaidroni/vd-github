@@ -27,7 +27,7 @@ function showNotification(text, duration)
 	local width, height = surface.GetTextSize(text)
 	if width < 60 then width = width + 10 end
 	Notifications.Frame = vgui.Create("DFrame")
-		Notifications.Frame:SetSize((width  * 0.95), 40)
+		Notifications.Frame:SetSize((width  * 1), 40)
 		Notifications.Frame:SetPos(0 - Notifications.Frame:GetWide(), ScrH() / 5)
 		Notifications.Frame:SetTitle("")
 		Notifications.Frame:ShowCloseButton(false)
@@ -35,7 +35,7 @@ function showNotification(text, duration)
 		-- painting the notification
 		local DurationBar = Notifications.Frame:GetWide()
 		function Notifications.Frame:Paint(w, h)
-			draw.RoundedBoxEx(5, 0, 0, width * 0.95, h, Color(72,72,72), false, true, false, true)
+			draw.RoundedBoxEx(5, 0, 0, width * 1, h, Color(72,72,72), false, true, false, true)
 			DurationBar = Lerp( 0.65 * FrameTime(), DurationBar, -2 )
 			draw.RoundedBoxEx(0, 0, Notifications.Frame:GetTall() - 10, DurationBar, 10, Color(170,0,0))
 		end

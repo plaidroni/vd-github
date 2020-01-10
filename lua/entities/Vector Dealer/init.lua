@@ -54,8 +54,8 @@ function ENT:Initialize()
     self:SetSolid(  SOLID_BBOX )
     self:SetUseType( SIMPLE_USE )
     self:DropToFloor()
-    BroadcastLua([[chat.AddText(Color(72,72,72), "The Dealer has Arrived.")]])
     self:Give("m9k_svu")
+    RunConsoleCommand( "notificationadd", "The Vector Dealer has arrived." )
     self.sound = CreateSound(self, Sound("ambient/wind/wind_bass.wav"))
     self.sound:SetSoundLevel(52)
     self.sound:PlayEx(1, 100)
@@ -71,6 +71,7 @@ function ENT:Initialize()
                 end
             end
         end
+        RunConsoleCommand( "notificationadd", "The Vector Dealer has left." )
         self:Remove()
     end)
 end

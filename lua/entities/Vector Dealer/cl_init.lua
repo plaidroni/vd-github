@@ -52,6 +52,9 @@ local function reRender()
 
 function LNMenu.showMenu( )
 -------------------------FRAME---------------------------------------
+        x,y,z = LocalPlayer():GetPos():Unpack()
+        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     menuOpen = true
 
     LNMenu.Frame = vgui.Create("DFrame")
