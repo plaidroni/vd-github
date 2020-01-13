@@ -35,16 +35,18 @@ function ENT:disappear()
                     self:SetModel( model )
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
-                    PrintTable(self:GetSequenceList())
+                    
                     v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
-                   --351
-                    self:AddGestureSequence(1209,false)
+                   
+                    self:AddGestureSequence(351,false)
                 end
                 timer.Simple(1,disappearinn)
         end
     end 
 end
+
 function ENT:Initialize() 
+    
     self:SetModel( model )
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
     self:CapabilitiesAdd( CAP_TURN_HEAD )
@@ -57,7 +59,7 @@ function ENT:Initialize()
     self:SetSolid(  SOLID_BBOX )
     self:SetUseType( SIMPLE_USE )
     self:DropToFloor()
-    self:Give("m9k_svu")
+    --self:Give("m9k_svu")
     RunConsoleCommand( "notificationadd", "The Vector Dealer has arrived." )
     self.sound = CreateSound(self, Sound("ambient/wind/wind_bass.wav"))
     self.sound:SetSoundLevel(52)
@@ -117,25 +119,30 @@ function ENT:Use( Name, Caller )
 end
  
 
+function ENT:DefaultGestureValue()
+    self:AddGestureSequence(351,false)
+end
 
-
+function ENT:GunDropSeq()
+    self:AddGestureSequence(1209,false)
+end
 
 
 net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
     wepindex = net.ReadInt(24)
     moneyamount = ply:getDarkRPVar("money")
+    --fucking dumbshit
     if moneyAmount >= LNInventory.Prices[wepindex] then    
         if moneyAmount - LNInventory.Prices[wepindex] > 0 then
             ply:setDarkRPVar( "money", moneyamount - LNInventory.Prices[wepindex])
             local gun = ents.Create( LNInventory.Items[wepindex] )
             gun:SetPos( ply:GetPos() + Vector(0,0,100))
-            local function up( ply, ent )
-            return true
-            end
-            hook.Add( "PlayerCanPickupWeapon", "monkey_has_a_chode", function( ply, wep )
+            hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
                 if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
             end )
+            
             gun:Spawn()
+            
             net.Start("vectordealer_CloseFrame")
             net.Send(ply)
         end
