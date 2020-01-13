@@ -119,13 +119,6 @@ function ENT:Use( Name, Caller )
 end
  
 
-function ENT:DefaultGestureValue()
-    self:AddGestureSequence(351,false)
-end
-
-function ENT:GunDropSeq()
-    self:AddGestureSequence(1209,false)
-end
 
 
 net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
