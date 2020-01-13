@@ -36,6 +36,7 @@ function ENT:disappear()
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
                     v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
+                    self:AddGestureSequence(351,false)
                 end
                 timer.Simple(1,disappearinn)
         end
@@ -113,6 +114,11 @@ function ENT:Use( Name, Caller )
     end
 end
  
+
+
+
+
+
 net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
     wepindex = net.ReadInt(24)
     moneyamount = ply:getDarkRPVar("money")
@@ -134,6 +140,10 @@ net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
     end
    
 end)
+
+
+
+
 
 function grabPosAngle()
     posang = {}
