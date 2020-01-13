@@ -35,8 +35,10 @@ function ENT:disappear()
                     self:SetModel( model )
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
+                    PrintTable(self:GetSequenceList())
                     v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
-                    self:AddGestureSequence(351,false)
+                   --351
+                    self:AddGestureSequence(1209,false)
                 end
                 timer.Simple(1,disappearinn)
         end
