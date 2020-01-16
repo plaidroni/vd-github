@@ -105,14 +105,21 @@ function ENT:Use( Name, Caller )
         Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
         Name:Freeze(false)
         timer.Create("beepboop", 3, 1, function()
-            moneyAmount = Name:getDarkRPVar("money")
+            net.Start("vectordealer_UsePanel")
+                net.Send(Name)
+
+                
+            --uncomment later
+
+
+            --[[moneyAmount = Name:getDarkRPVar("money")
             if moneyAmount > 50000 then
                 
                 net.Start("vectordealer_UsePanel")
                 net.Send(Name)
             else
             self:disappear()
-            end
+            end]]
         end)
     end
 end

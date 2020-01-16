@@ -10,7 +10,7 @@ VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, 
 VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
 VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
 
-
+VDInventory.numberOfItems = #VDInventory.Items
 surface.CreateFont("LividityTEXT", {
     font = "Roboto",
     size = 23,
@@ -50,6 +50,7 @@ local function reRender()
         VDMenu.Panel.Icon:SetLookAt( ( mn + mx ) * 0.5 )
     end
 --initialization of the menu itself
+
 function VDMenu.showMenu( )
 -------------------------FRAME---------------------------------------
     --effects based on clicking on VDealer
@@ -58,8 +59,81 @@ function VDMenu.showMenu( )
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     menuOpen = true
 
+    VDMenu.Frame = vgui.Create("DFrame")
+    VDMenu.Frame:SetPos(0,0)
+    VDMenu.Frame:SetSize(ScrW(), ScrH())
+    VDMenu.Frame:ShowCloseButton(false)
+    VDMenu.Frame:SetDraggable(false)
+    VDMenu.Frame:SetTitle("")
+    VDMenu.Frame:MakePopup()
+    countdown = 100
+    VDMenu.Frame.Paint = function()
+        VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
+    --grabs the number of items from the soon to be sql table
+    
+        surface.SetDrawColor( 50, 50, 50, 150 )
+        surface.DrawRect( 0, 0, VDMenu.Frame:GetWide(), VDMenu.Frame:GetTall() )
+        
+        surface.SetDrawColor( 200, 200, 200, 255 )
+        if VDInventory.numberOfItems > 1 then
+            
+            countdown = Lerp(FrameTime(), countdown, 0 )
+            print(countdown)
+            for i = 1, VDInventory.numberOfItems+1 do
+                local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i +countdown ) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
+                local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i +countdown) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
+                local x2 = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300
+                local y2 = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300
+                       
+                local ang1 = (i-1)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
+                local ang2 = (i-0)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
+                --[[local ang3 = 360 - (math.deg(math.atan2(gui.MouseX() - ScrW()/2, gui.MouseY() - ScrH()/2)) + 180)
+                
+                if ang3 < ang2 and ang3 > ang1 then
+                    LocalPlayer():ConCommand(UserToolCommand[i])
+                end
+                
+                if ang2 > 360 then
+                    ang2 = ang2-360
+                end
+                
+                if ang2 < ang1 then
+                    if ang3 < ang2 then
+                        LocalPlayer():ConCommand(UserToolCommand[i])
+                    end
+                end
+                
+                if ang3 < ang2 and ang3 > ang1 then
+                    LocalPlayer():ConCommand(UserToolCommand[i])
+                end]]
+                
+                surface.SetDrawColor( 255, 255, 255, 255)
+                surface.DrawLine(x,y,x2,y2)
+                
+            end
+        end
+    end
+    timer.Simple(5,function()
+            VDMenu.Frame:Close()
+        end)
+    for i = 1, VDInventory.numberOfItems do
+        local Tool = vgui.Create("DButton", VDMenu.Frame)
+        
+        local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i + countdown) ) * 250 - 50
+        local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i + countdown) ) * 250 - 15
 
-
+        Tool:SetSize( 100, 30 )
+        Tool:SetPos( x,y )
+        Tool:SetTextColor(Color(255,255,255,255))
+        Tool:SetFont("ToolsTextFont")
+        Tool.DoClick = function()
+        end
+        Tool.Paint = function()
+                surface.SetDrawColor( 68, 87, 101, 0 )
+        end
+    end
+end
+--[[
         --Setting the sizing to work with all resolutions, initialization
     VDMenu.Frame = vgui.Create("DFrame")
         VDMenu.Frame:SetSize( ScrW() / 1.5, ScrH() / 1.3)
@@ -226,7 +300,7 @@ function VDMenu.BuyButton:Paint(w, h)
     draw.DrawText( LNBuyText, "LividityBuy", LNBx / 2 - surface.GetTextSize(LNBuyText) / 2, LNBy / 2 - 100, Color( 255, 255, 255, 255 ))
 end
 end
-
+]]
 
 
 
