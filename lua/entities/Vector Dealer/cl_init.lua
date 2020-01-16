@@ -87,26 +87,6 @@ function VDMenu.showMenu( )
                        
                 local ang1 = (i-1)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
                 local ang2 = (i-0)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
-                --[[local ang3 = 360 - (math.deg(math.atan2(gui.MouseX() - ScrW()/2, gui.MouseY() - ScrH()/2)) + 180)
-                
-                if ang3 < ang2 and ang3 > ang1 then
-                    LocalPlayer():ConCommand(UserToolCommand[i])
-                end
-                
-                if ang2 > 360 then
-                    ang2 = ang2-360
-                end
-                
-                if ang2 < ang1 then
-                    if ang3 < ang2 then
-                        LocalPlayer():ConCommand(UserToolCommand[i])
-                    end
-                end
-                
-                if ang3 < ang2 and ang3 > ang1 then
-                    LocalPlayer():ConCommand(UserToolCommand[i])
-                end]]
-                
                 surface.SetDrawColor( 255, 255, 255, 255)
                 surface.DrawLine(x,y,x2,y2)
                 
