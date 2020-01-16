@@ -15,6 +15,8 @@ function tables_exist()
             Msg( sql.LastError( result ) .. "\n")
         end
     end
+
+
     if (sql.TableExists("VDModel")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDModel")) then
@@ -29,6 +31,8 @@ function tables_exist()
             Msg( sql.LastError( result ) .. "\n")
         end
     end
+
+
     if (sql.TableExists("VDSetModel")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDSetModel")) then
@@ -44,6 +48,26 @@ function tables_exist()
             Msg( sql.LastError( result ) .. "\n")
         end
     end
+
+    if (sql.TableExists("VDCoin")) then
+        Msg("Table already exist!\n")
+    elseif (!sql.TableExists("VDCoin")) then
+        query = "CREATE TABLE VDCoin ( player TEXT, coin INTEGER )"
+        result = sql.Query(query)
+        print(result)
+ 
+        if (sql.TableExists("VDCoin")) then
+            Msg("Success! table created \n")
+        else
+            Msg("Something went wrong with the VDCoin query! \n")
+            Msg( sql.LastError( result ) .. "\n")
+        end
+    end
+
+
+
+
+
 end
 
  

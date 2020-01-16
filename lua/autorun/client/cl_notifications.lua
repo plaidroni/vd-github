@@ -85,3 +85,8 @@ net.Receive("Currency_Notification",function()
 		table.insert(Notifications.Queue, text)
 	end
 end)
+
+
+--this part is by TOBIAS i repeat not plaidroni this shit but commented™ code is mine (づ｡◕‿‿◕｡)づ
+-----------------------------I DONT KNOW HOW TO SHARE COMMANDS SO FUCK ME I GUESS LOL--------------------------------------------
+
