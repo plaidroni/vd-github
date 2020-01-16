@@ -1,5 +1,4 @@
 include("shared.lua")
-include("init.lua")
 VDMenu = {}
 VDMenu.Listings = {}
 VDMenu.Text = {}
@@ -7,39 +6,9 @@ VDMenu.Frame = {}
 VDInventory = {}
 
 -- copy over from server, too lazy to make dynamic updating. will add in future
-VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper", "ls_sniper", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
 VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
 VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
-
-
-function getVDInventory()
-    for i=1,3 do
-        res = sql.Query("INSERT INTO VDInventory (gun,model,price) VALUES( '"..VDInventory.Items[i].."' , '"..VDInventory.Models[i].."' , "..VDInventory.Prices[i].." ); ")
-        print(sql.LastError())
-        print(VDInventory.Items[i].." "..VDInventory.Models[i].." "..VDInventory.Prices[i])
-    end
-    randtbl = {}
-    guns = {{}}
-    randInventory = math.Rand(3, 6)
-    res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;") 
-    if not res then return end
-    for i = 1,res do
-        table.insert(randtbl, i)
-    end
-    
-    for i=1,randInventory do
-        res = table.Random(randtbl)
-        table.RemoveByValue(randtbl, res)
-        guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
-    end
-end
-concommand.Add( "getVDInventory", getVDInventory, nil, "", { FCVAR_DONTRECORD } )
-function VDUnpack()
-
-end
-
-
-
 
 VDInventory.numberOfItems = #VDInventory.Items
 surface.CreateFont("LividityTEXT", {
@@ -109,7 +78,6 @@ function VDMenu.showMenu( )
         if VDInventory.numberOfItems > 1 then
             
             countdown = Lerp(FrameTime(), countdown, 0 )
-            print(countdown)
             for i = 1, VDInventory.numberOfItems+1 do
                 local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i +countdown ) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
                 local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i +countdown) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
@@ -130,8 +98,8 @@ function VDMenu.showMenu( )
     for i = 1, VDInventory.numberOfItems do
         local Tool = vgui.Create("DButton", VDMenu.Frame)
         
-        local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i + countdown) ) * 250 - 50
-        local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i + countdown) ) * 250 - 15
+        local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 50
+        local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
 
         Tool:SetSize( 100, 30 )
         Tool:SetPos( x,y )
