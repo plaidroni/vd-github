@@ -52,7 +52,7 @@ function tables_exist()
     if (sql.TableExists("VDCoin")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDCoin")) then
-        query = "CREATE TABLE VDCoin ( player TEXT, coin INTEGER )"
+        query = "CREATE TABLE VDCoin ( Name TEXT, Money INTEGER )"
         result = sql.Query(query)
         print(result)
  
@@ -60,6 +60,21 @@ function tables_exist()
             Msg("Success! table created \n")
         else
             Msg("Something went wrong with the VDCoin query! \n")
+            Msg( sql.LastError( result ) .. "\n")
+        end
+    end
+
+    if (sql.TableExists("VDInventory")) then
+        Msg("Table already exist!\n")
+    elseif (!sql.TableExists("VDInventory")) then
+        query = "CREATE TABLE VDInventory ( gun TEXT, model TEXT, price INTEGER )"
+        result = sql.Query(query)
+        print(result)
+ 
+        if (sql.TableExists("VDInventory")) then
+            Msg("Success! table created \n")
+        else
+            Msg("Something went wrong with the VDInventory query! \n")
             Msg( sql.LastError( result ) .. "\n")
         end
     end
