@@ -1,6 +1,12 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
+util.AddNetworkString("vectordealer_UsePanel")
+util.AddNetworkString("vectordealer_BuyWeapon")
+util.AddNetworkString("vectordealer_TeleportCasino")
+util.AddNetworkString("vectordealer_AlertPlayers")
+util.AddNetworkString("vectordealer_TimerOut")
+util.AddNetworkString("vectordealer_CloseFrame")
 -- CONFIG
 
 LNInventory = {}
@@ -13,12 +19,7 @@ PrecacheParticleSystem( "generic_smoke" )
 
 -- END CONFIG
 
-util.AddNetworkString("vectordealer_UsePanel")
-util.AddNetworkString("vectordealer_BuyWeapon")
-util.AddNetworkString("vectordealer_TeleportCasino")
-util.AddNetworkString("vectordealer_AlertPlayers")
-util.AddNetworkString("vectordealer_TimerOut")
-util.AddNetworkString("vectordealer_CloseFrame")
+
 function ENT:disappear()
     sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos() )
     local closeplayers = ents.FindInSphere( self:GetPos(), 500 )
@@ -106,9 +107,9 @@ function ENT:Use( Name, Caller )
         Name:Freeze(false)
         timer.Create("beepboop", 3, 1, function()
             net.Start("vectordealer_UsePanel")
-                net.Send(Name)
+            net.Send(Name)
 
-                
+
             --uncomment later
 
 
