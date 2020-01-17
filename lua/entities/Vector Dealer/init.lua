@@ -193,10 +193,21 @@ function getVDInventory()
    --this is really stupid
     randtbl = {}
     guns = {{}}
-    --for grabbing amount of guns (3-6)
-    randInventory = math.Rand(3, 6)
     res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
     if not res then return end
+
+    --this lets us have differing sizes if they dont want a lot of items
+    if res < 6 then 
+        randInventory = math.Rand(3,res)
+    elseif res < 3 then
+        randInventory = math.Rand(1,res)
+    else
+        randInventory = math.Rand(3, 6)
+    end
+
+
+
+    
    
    --creating a table of possible selections
     for i = 1,res do
