@@ -195,7 +195,7 @@ function getVDInventory()
     guns = {{}}
     res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
     if not res then return end
-
+    res = tonumber(res)
     --this lets us have differing sizes if they dont want a lot of items
     if res < 6 then 
         randInventory = math.Rand(3,res)
