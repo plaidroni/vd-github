@@ -5,6 +5,7 @@ VDMenu.Text = {}
 VDMenu.Frame = {}
 VDInventory = {}
 
+
 VDInventory.Items = {} 
 VDInventory.Models = {} 
 VDInventory.Prices = {} 
@@ -41,6 +42,37 @@ end)
 
 
 
+-- copy over from server, too lazy to make dynamic updating. will add in future
+VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper", "ls_sniper", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl", "models/weapons/w_snip_sg550.mdl", "models/weapons/w_snip_sg550.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
+
+function getVDInventory()
+    for i=1,3 do
+        res = sql.Query("INSERT INTO VDInventory (gun,model,price) VALUES( '"..VDInventory.Items[i].."' , '"..VDInventory.Models[i].."' , "..VDInventory.Prices[i].." ); ")
+        print(sql.LastError())
+        print(VDInventory.Items[i].." "..VDInventory.Models[i].." "..VDInventory.Prices[i])
+    end
+    randtbl = {}
+    guns = {{}}
+    randInventory = math.Rand(3, 6)
+    res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;") 
+    if not res then return end
+    for i = 1,res do
+        table.insert(randtbl, i)
+    end
+    
+    for i=1,randInventory do
+        res = table.Random(randtbl)
+        table.RemoveByValue(randtbl, res)
+        guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
+    end
+end
+concommand.Add( "getVDInventory", getVDInventory, nil, "", { FCVAR_DONTRECORD } )
+function VDUnpack()
+
+end
+
 VDInventory.numberOfItems = #VDInventory.Items
 surface.CreateFont("LividityTEXT", {
     font = "Roboto",
@@ -69,17 +101,6 @@ local clickedItem = 0
 
  -- Made by plaidroni & Tobias
 
-local function reRender()
-        local mn, mx = VDMenu.Panel.Icon.Entity:GetRenderBounds()
-        local size = mx.x * 2
-        size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
-        size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
-        size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
-
-        VDMenu.Panel.Icon:SetFOV( 45 )
-        VDMenu.Panel.Icon:SetCamPos( Vector( size, size, size ) )
-        VDMenu.Panel.Icon:SetLookAt( ( mn + mx ) * 0.5 )
-    end
 --initialization of the menu itself
 
 function VDMenu.showMenu( )
@@ -127,20 +148,44 @@ function VDMenu.showMenu( )
     timer.Simple(5,function()
             VDMenu.Frame:Close()
         end)
+    local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
+
+        VDSit:SetSize( ScrH()/9, ScrW()/16)
+        xz,yz = VDSit:GetSize()
+        VDSit:SetPos((ScrW() / 2) - xz/4, (ScrH() / 2) - yz/2.25)
+        VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
+        function VDSit:LayoutEntity( Entity ) return end -- disables default rotation
+        function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
+        local mn, mx = VDSit.Entity:GetRenderBounds()
+        local size = mx.x * 2
+        size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
+        size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
+        size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
+        VDSit:SetFOV( 45 )
+        VDSit:SetCamPos( Vector( size, size, size ) )
+        VDSit:SetLookAt( ( mn + mx ) * 0.5 )
     for i = 1, VDInventory.numberOfItems do
-        local Tool = vgui.Create("DButton", VDMenu.Frame)
         
         local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 50
         local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
 
-        Tool:SetSize( 100, 30 )
-        Tool:SetPos( x,y )
-        Tool:SetTextColor(Color(255,255,255,255))
-        Tool:SetFont("ToolsTextFont")
-        Tool.DoClick = function()
-        end
-        Tool.Paint = function()
-                surface.SetDrawColor( 68, 87, 101, 0 )
+        local icon = vgui.Create( "DModelPanel", VDMenu.Frame )
+
+        icon:SetSize( ScrH()/9, ScrW()/16)
+        xz,yz = icon:GetSize()
+        icon:SetPos(x - xz/4, y - yz/2.25)
+        icon:SetModel( VDInventory.Models[i] ) -- you can only change colors on playermodels
+        function icon.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
+        local mn, mx = icon.Entity:GetRenderBounds()
+        local size = mx.x * 2
+        size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
+        size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
+        size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
+
+        icon:SetFOV( 45 )
+        icon:SetCamPos( Vector( size, size, size ) )
+        icon:SetLookAt( ( mn + mx ) * 0.5 )
+        icon.DoClick = function()
         end
     end
 end
