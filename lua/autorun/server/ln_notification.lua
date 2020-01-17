@@ -105,11 +105,11 @@ concommand.Add( "notificationadd", SendNotifToClients, nil, "Display an advert t
 -----------------------------I DONT KNOW HOW TO SHARE COMMANDS SO FUCK ME I GUESS LOL--------------------------------------------
 
 --Runs the start bounty function every 20 minutes
-timer.Create("StartBounty", 1200, 0 , StartBounty)
+
 t, predator, prey = {}
 --bounty price
 bounty = 50
-local function StartBounty()
+timer.Create("StartBounty", 1200, 0 , function()
     --ensuring you cant get gold with suicide
     if max == 1 then return end
 
@@ -139,10 +139,10 @@ local function StartBounty()
     SendIndividualNotif(predator, "Your prey is "..prey:Nick()..".")
     SendIndividualNotif(prey, "You are being hunted.")
     
-    
 end
+end)
 
-function GM:PlayerDeath(victim, inflictor, killer)
+function PlayerDeath(victim, inflictor, killer)
     --checking that the predator killed the prey
     if victim == prey && killer == predator then
         --running only if the timer hasn't ended

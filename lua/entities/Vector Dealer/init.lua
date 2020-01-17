@@ -7,12 +7,13 @@ util.AddNetworkString("vectordealer_TeleportCasino")
 util.AddNetworkString("vectordealer_AlertPlayers")
 util.AddNetworkString("vectordealer_TimerOut")
 util.AddNetworkString("vectordealer_CloseFrame")
+util.AddNetworkString("TableSend")
 -- CONFIG
 
-LNInventory = {}
-LNInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
-LNInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
-LNInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
+VDInventory = {}
+VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
 model = sql.QueryValue("SELECT Model FROM VDSetModel;")
 game.AddParticles( "gmod_effects.pcf" )
 PrecacheParticleSystem( "generic_smoke" )
@@ -28,6 +29,7 @@ function ENT:disappear()
             v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
                 function disappearinn()
                     PosAngTbl = grabPosAngle()
+                    
                     local randomvec = PosAngTbl[1]
                     local randomangle = PosAngTbl[2]
                     for g,gg in pairs(player.GetAll()) do
@@ -47,7 +49,7 @@ function ENT:disappear()
 end
 
 function ENT:Initialize() 
-    
+    getVDInventory()
     self:SetModel( model )
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
     self:CapabilitiesAdd( CAP_TURN_HEAD )
@@ -132,10 +134,10 @@ net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
     wepindex = net.ReadInt(24)
     moneyamount = ply:getDarkRPVar("money")
     --fucking dumbshit
-    if moneyAmount >= LNInventory.Prices[wepindex] then    
-        if moneyAmount - LNInventory.Prices[wepindex] > 0 then
-            ply:setDarkRPVar( "money", moneyamount - LNInventory.Prices[wepindex])
-            local gun = ents.Create( LNInventory.Items[wepindex] )
+    if moneyAmount >= VDInventory.Prices[wepindex] then    
+        if moneyAmount - VDInventory.Prices[wepindex] > 0 then
+            ply:setDarkRPVar( "money", moneyamount - VDInventory.Prices[wepindex])
+            local gun = ents.Create( VDInventory.Items[wepindex] )
             gun:SetPos( ply:GetPos() + Vector(0,0,100))
             hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
                 if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
@@ -183,3 +185,57 @@ function grabPosAngle()
     model = sql.QueryValue("SELECT Model FROM VDSetModel;")
     return posang
 end
+
+
+
+
+function getVDInventory()
+    randtbl = {}
+    guns = {{}}
+    randInventory = math.Rand(3, 6)
+    res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
+    if not res then return end
+    for i = 1,res do
+        table.insert(randtbl, i)
+    end
+    
+    for i=1,randInventory do
+        res = randtbl[math.random( 1, #randtbl )]
+        table.RemoveByValue(randtbl, res)
+        guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
+  
+    end
+    appendToInv(guns)
+    net.Start("TableSend")
+    net.WriteTable(guns)
+    net.Send(player.GetAll()[1])
+end
+function appendToInv(guns)
+    VDInventory.Models = {}
+    VDInventory.Items = {}
+    VDInventory.Prices = {}
+    num = table.getn(guns)
+    x=1
+    for i=1, num do
+        for k,v in pairs(guns[i]) do
+                
+            if x == 1 then
+                table.insert(VDInventory.Models, v)
+
+                x = x + 1
+                   
+            elseif x == 2 then
+                table.insert(VDInventory.Items, v)
+                x = x + 1   
+
+            elseif x == 3 then
+                        
+                table.insert(VDInventory.Prices,  v)
+                x = 1
+
+            else return 
+            end
+        end
+    end
+end
+

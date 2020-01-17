@@ -5,35 +5,41 @@ VDMenu.Text = {}
 VDMenu.Frame = {}
 VDInventory = {}
 
--- copy over from server, too lazy to make dynamic updating. will add in future
-VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper", "ls_sniper", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
-VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
-VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Items = {} 
+VDInventory.Models = {} 
+VDInventory.Prices = {} 
 
-function getVDInventory()
-        for i=1,3 do
-            res = sql.Query("INSERT INTO VDInventory (gun,model,price) VALUES( '"..VDInventory.Items[i].."' , '"..VDInventory.Models[i].."' , "..VDInventory.Prices[i].." ); ")
-            print(sql.LastError())
-            print(VDInventory.Items[i].." "..VDInventory.Models[i].." "..VDInventory.Prices[i])
-        end
-        randtbl = {}
-        guns = {{}}
-        randInventory = math.Rand(3, 6)
-        res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;") 
-        if not res then return end
-        for i = 1,res do
-            table.insert(randtbl, i)
-        end
-        
-        for i=1,randInventory do
-            res = table.Random(randtbl)
-            table.RemoveByValue(randtbl, res)
-            guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
+--lol
+net.Receive("TableSend", function()
+    num = table.getn(guns)
+    x=1
+    for i=1, num do
+        for k,v in pairs(guns[i]) do
+                
+            if x == 1 then
+                table.insert(VDInventory.Models, v)
+
+                x = x + 1
+                   
+            elseif x == 2 then
+                table.insert(VDInventory.Items, v)
+                x = x + 1   
+
+            elseif x == 3 then
+                        
+                table.insert(VDInventory.Prices,  v)
+                x = 1
+
+            else return 
+            end
         end
     end
-    concommand.Add( "getVDInventory", getVDInventory, nil, "", { FCVAR_DONTRECORD } )
-    function VDUnpack()
-end
+
+end)
+
+
+
+
 
 VDInventory.numberOfItems = #VDInventory.Items
 surface.CreateFont("LividityTEXT", {
@@ -79,6 +85,7 @@ local function reRender()
 function VDMenu.showMenu( )
 -------------------------FRAME---------------------------------------
     --effects based on clicking on VDealer
+    
     x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
