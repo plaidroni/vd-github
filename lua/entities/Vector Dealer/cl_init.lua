@@ -9,17 +9,46 @@ VDInventory = {}
 VDInventory.Items = {} 
 VDInventory.Models = {} 
 VDInventory.Prices = {} 
-
+VDInventory.numberOfItems = #VDInventory.Items
 --lol
 net.Receive("TableSend", function()
-    num = table.getn(guns)
+    --resets last inventory cycle
+    VDInventory.Items = {} 
+    VDInventory.Models = {} 
+    VDInventory.Prices = {}
+    --grabs the inventory
+    guns=net.ReadTable()
+    num = #guns
+    
+    --for separating models,item,price
     x=1
+    --loop through matrix
     for i=1, num do
+        --loop through individual guns so we can split that bitch
         for k,v in pairs(guns[i]) do
-                
+               --[[
+                format is this lol
+
+                guns = {
+                1 = {String model1, String item1, Int price1},
+                2 = {String model2, String item2, Int price2},
+                3 = {String model3, String item3, Int price3},
+                4 = {String model4, String item4, Int price4},
+                5 = {String model5, String item5, Int price5},
+                6 = {String model6, String item6, Int price6}
+                }
+
+                so when we are looping below we can do it like this
+
+                gun[1] == {String model1, String item1, Int price1} --> gun[1][1] == String model1
+
+                this is so we can store the same index for the same gun but in differing tables
+                so index 1 is always gun 1 for all tables
+               ]]
+
+
             if x == 1 then
                 table.insert(VDInventory.Models, v)
-
                 x = x + 1
                    
             elseif x == 2 then
@@ -35,45 +64,12 @@ net.Receive("TableSend", function()
             end
         end
     end
-
+    --this is so we can decide how to draw the menu based on the items
+    VDInventory.numberOfItems = #VDInventory.Items
 end)
 
 
 
-
-
--- copy over from server, too lazy to make dynamic updating. will add in future
-VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper", "ls_sniper", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
-VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl", "models/weapons/w_snip_sg550.mdl", "models/weapons/w_snip_sg550.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
-VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
-
-function getVDInventory()
-    for i=1,3 do
-        res = sql.Query("INSERT INTO VDInventory (gun,model,price) VALUES( '"..VDInventory.Items[i].."' , '"..VDInventory.Models[i].."' , "..VDInventory.Prices[i].." ); ")
-        print(sql.LastError())
-        print(VDInventory.Items[i].." "..VDInventory.Models[i].." "..VDInventory.Prices[i])
-    end
-    randtbl = {}
-    guns = {{}}
-    randInventory = math.Rand(3, 6)
-    res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;") 
-    if not res then return end
-    for i = 1,res do
-        table.insert(randtbl, i)
-    end
-    
-    for i=1,randInventory do
-        res = table.Random(randtbl)
-        table.RemoveByValue(randtbl, res)
-        guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
-    end
-end
-concommand.Add( "getVDInventory", getVDInventory, nil, "", { FCVAR_DONTRECORD } )
-function VDUnpack()
-
-end
-
-VDInventory.numberOfItems = #VDInventory.Items
 surface.CreateFont("LividityTEXT", {
     font = "Roboto",
     size = 23,
@@ -189,6 +185,68 @@ function VDMenu.showMenu( )
         end
     end
 end
+
+
+
+-------------------------Blur--------------------------
+    -- Panel based blur function by Chessnut from NutScript
+    --make that bitch pretty (づ｡◕‿‿◕｡)づ
+local blur = Material( "pp/blurscreen" )
+function VDMenu.blur( panel, layers, density, alpha )
+    -- Its a scientifically proven fact that blur improves a script
+    local x, y = panel:LocalToScreen(0, 0)
+
+    surface.SetDrawColor( 72,72,72, alpha )
+    surface.SetMaterial( blur )
+
+    for i = 1, 3 do
+        blur:SetFloat( "$blur", ( i / layers ) * density )
+        blur:Recompute()
+        render.UpdateScreenEffectTexture()
+        surface.DrawTexturedRect( -x, -y, ScrW(), ScrH() )
+    end
+end
+
+
+
+
+
+--open the menu
+function VDMenu.KeyPress( ply , bind, pressed)
+    if (bind == "gm_showspare2" && (not menuOpen)) then
+        VDMenu.showMenu( )
+    end
+end
+net.Receive("vectordealer_UsePanel", function( len )
+    VDMenu.showMenu()
+end)
+hook.Add("PlayerBindPress", "VDMenu.KeyPress", VDMenu.KeyPress)
+
+
+   
+net.Receive("vectordealer_AlertPlayers", function()
+   
+end)
+   
+function ENT:Draw()
+--made by me tobias too mother fucker some of this dogshit code is mine ):<
+--MADE BY plaidroni (http://steamcommunity.com/id/plaidroni/)
+    self:DrawModel()
+   
+    --------------------------------
+ 
+end
+
+
+
+
+
+
+
+
+
+
+
 --[[
         --Setting the sizing to work with all resolutions, initialization
     VDMenu.Frame = vgui.Create("DFrame")
@@ -357,54 +415,3 @@ function VDMenu.BuyButton:Paint(w, h)
 end
 end
 ]]
-
-
-
--------------------------Blur--------------------------
-    -- Panel based blur function by Chessnut from NutScript
-    --make that bitch pretty (づ｡◕‿‿◕｡)づ
-local blur = Material( "pp/blurscreen" )
-function VDMenu.blur( panel, layers, density, alpha )
-    -- Its a scientifically proven fact that blur improves a script
-    local x, y = panel:LocalToScreen(0, 0)
-
-    surface.SetDrawColor( 72,72,72, alpha )
-    surface.SetMaterial( blur )
-
-    for i = 1, 3 do
-        blur:SetFloat( "$blur", ( i / layers ) * density )
-        blur:Recompute()
-        render.UpdateScreenEffectTexture()
-        surface.DrawTexturedRect( -x, -y, ScrW(), ScrH() )
-    end
-end
-
-
-
-
-
---open the menu
-function VDMenu.KeyPress( ply , bind, pressed)
-    if (bind == "gm_showspare2" && (not menuOpen)) then
-        VDMenu.showMenu( )
-    end
-end
-net.Receive("vectordealer_UsePanel", function( len )
-    VDMenu.showMenu()
-end)
-hook.Add("PlayerBindPress", "VDMenu.KeyPress", VDMenu.KeyPress)
-
-
-   
-net.Receive("vectordealer_AlertPlayers", function()
-   
-end)
-   
-function ENT:Draw()
---made by me tobias too mother fucker most of this dogshit code is mine ):<
---MADE BY plaidroni (http://steamcommunity.com/id/plaidroni/)
-    self:DrawModel()
-   
-    --------------------------------
- 
-end

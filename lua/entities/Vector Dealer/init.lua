@@ -190,31 +190,44 @@ end
 
 
 function getVDInventory()
+   --this is really stupid
     randtbl = {}
     guns = {{}}
+    --for grabbing amount of guns (3-6)
     randInventory = math.Rand(3, 6)
     res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
     if not res then return end
+   
+   --creating a table of possible selections
     for i = 1,res do
         table.insert(randtbl, i)
     end
     
+
     for i=1,randInventory do
+        --gives me a random value from created table
         res = randtbl[math.random( 1, #randtbl )]
+        --removes value to not repeat
         table.RemoveByValue(randtbl, res)
+        --stores the selected gun
         guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
-  
     end
+    
+    --updates tables ^^^^^^^^^^^^^^^^^^^^^^
     appendToInv(guns)
+    --sends so we can interact w/ the menu
     net.Start("TableSend")
     net.WriteTable(guns)
     net.Send(player.GetAll()[1])
 end
+
+--updates tables ^^^^^^^^^^^^^^^^^^^^^^
+--this shit is explained in cl_init.lua its a copy paste lol
 function appendToInv(guns)
-    VDInventory.Models = {}
-    VDInventory.Items = {}
+    VDInventory.Items = {} 
+    VDInventory.Models = {} 
     VDInventory.Prices = {}
-    num = table.getn(guns)
+    num = #guns
     x=1
     for i=1, num do
         for k,v in pairs(guns[i]) do
@@ -237,5 +250,7 @@ function appendToInv(guns)
             end
         end
     end
+    VDInventory.numberOfItems = #VDInventory.Items
 end
+
 
