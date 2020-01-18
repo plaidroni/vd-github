@@ -1,8 +1,12 @@
 
 function tables_exist()
-    e = ents.Create("vectordealer")
-    e:Spawn()
-    if ( !IsValid( e ) ) then print("gay") end
+    
+
+
+
+
+
+    
     if (sql.TableExists("VDPos")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDPos")) then

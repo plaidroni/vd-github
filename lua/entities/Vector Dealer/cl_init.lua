@@ -150,7 +150,15 @@ function VDMenu.showMenu( )
         xz,yz = VDSit:GetSize()
         VDSit:SetPos((ScrW() / 2) - xz/4, (ScrH() / 2) - yz/2.25)
         VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
-        function VDSit:LayoutEntity( Entity ) return end -- disables default rotation
+        
+        function VDSit:LayoutEntity( e )  
+            e:SetSequence( 351 )
+            if e:GetCycle() >= 0.98 then 
+                e:SetCycle( 0.02 ) 
+            end
+            VDSit:RunAnimation()
+        end 
+
         function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         local mn, mx = VDSit.Entity:GetRenderBounds()
         local size = mx.x * 2
