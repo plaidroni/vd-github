@@ -68,14 +68,14 @@ function tables_exist()
     if (sql.TableExists("VDInventory")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDInventory")) then
-        query = "CREATE TABLE VDInventory ( model TEXT, gun TEXT, price INTEGER )"
+        query = "CREATE TABLE VDInventory ( gun TEXT, model TEXT, price INTEGER )"
         result = sql.Query(query)
-        sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_auga3.mdl','w_auga3',50);")
-        sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_dmg_m16ag.mdl','w_dmg_m16ag',50);")
-        sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_dmg_vally.mdl','w_dmg_vally',50);")
-        sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_fn_f2000.mdl','w_fn_f2000',50);")
-        sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_fn_scar_h.mdl','w_fn_scar_h',50);")
-        sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_snip_sg550.mdl','ls_sniper',50);")
+        sql.Query("INSERT INTO VDInventory(gun,model,price) VALUES('ls_sniper','models/weapons/w_snip_sg550.mdl',50);")
+        sql.Query("INSERT INTO VDInventory(gun,model,price) VALUES('ls_sniper','models/weapons/w_snip_sg550.mdl',50);")
+        sql.Query("INSERT INTO VDInventory(gun,model,price) VALUES('ls_sniper','models/weapons/w_snip_sg550.mdl',50);")
+        sql.Query("INSERT INTO VDInventory(gun,model,price) VALUES('ls_sniper','models/weapons/w_snip_sg550.mdl',50);")
+        sql.Query("INSERT INTO VDInventory(gun,model,price) VALUES('ls_sniper','models/weapons/w_snip_sg550.mdl',50);")
+        sql.Query("INSERT INTO VDInventory(gun,model,price) VALUES('ls_sniper','models/weapons/w_snip_sg550.mdl',50);")
 
         print(result)
  

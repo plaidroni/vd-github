@@ -189,10 +189,56 @@ function VDMenu.showMenu( )
         icon:SetFOV( 45 )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
+        
+
+
         icon.DoClick = function()
+            VDMenu.BuyButtonFrame:MoveTo(LNFx, ScrH() * -1510/-1920,.5,0,-1)
+        timer.Simple(.7,function()
+            LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
+            VDMenu.BuyButton:SetText("Buy for $"..VDInventory.Prices[i].."?")
+            VDMenu.BuyButtonFrame:MoveTo(LNFx,ScrH() * -1690/-1920,.5,0,-1)
+        end)
         end
+
+
+
+
+
+
+        VDMenu.BuyButtonFrame = vgui.Create("DFrame")
+            VDMenu.BuyButtonFrame:SetSize( ScrW() / 1.5, ScrH() / 15)
+            VDMenu.BuyButtonFrame:SetPos( VDMenu.Frame:GetPos(), ScrH() * -1510/-1920)
+            VDMenu.BuyButtonFrame:SetTitle("")
+            VDMenu.BuyButtonFrame:ShowCloseButton(false)
+            VDMenu.BuyButtonFrame:SetDraggable(false)
+            VDMenu.BuyButtonFrame:MakePopup()
+
+    VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.BuyButtonFrame )
+        VDMenu.BuyButton:SetText( "Sample Text UwU" )
+        VDMenu.BuyButton:SetPos( 0,0 )
+        VDMenu.BuyButton:SetSize( ScrW() / 1.5, ScrH() / 5 )
+        LNBx, LNBy = VDMenu.BuyButton:GetSize()
+        VDMenu.BuyButton.DoClick = function()
+            net.Start("vectordealer_BuyWeapon")
+            net.WriteInt(clickedItem, 24) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
+            net.SendToServer()
+        end
+        VDMenu.Frame:MoveToFront()
+
+    --making sure this shit ACTUALLY closes
+    VDMenu.Frame.OnClose = function() 
+        VDMenu.BuyButtonFrame:Close()
+    end 
+
+    
+        
     end
+
+
+
 end
+
 
 
 
