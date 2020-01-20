@@ -68,7 +68,7 @@ function tables_exist()
     if (sql.TableExists("VDInventory")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDInventory")) then
-        query = "CREATE TABLE VDInventory ( gun TEXT, model TEXT, price INTEGER )"
+        query = "CREATE TABLE VDInventory ( model TEXT, gun TEXT, price INTEGER )"
         result = sql.Query(query)
         sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_auga3.mdl','w_auga3',50);")
         sql.Query("INSERT INTO VDInventory(model,gun,price) VALUES('models/weapons/w_dmg_m16ag.mdl','w_dmg_m16ag',50);")
