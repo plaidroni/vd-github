@@ -5,25 +5,6 @@ function PlayerInitialSpawn( ply )
 		sql.Query("INSERT INTO VDCOIN( Name, Money ) VALUES ('"..ply:GetSteamID().."', 0);")
 	end
 end
-hook.Add( "PopulatePropMenu", "Vector Dealer", function()
-
-	local contents = {}
-
-
-	
-	-- Entities
-	table.insert( contents, {
-		type = "header",
-		text = "Vector Dealer"
-	} )
-	table.insert( contents, {
-		type = "entity",
-		spawnname = "vectordealer",
-		nicename = "Vector Dealer",
-		material = "models/vector_orc.mdl"
-	} )
-	
-
-
-	spawnmenu.AddPropCategory( "VectorDealer", "Vector Dealer", contents, "icon16/box.png" )
+hook.Add( "AddToolMenuTabs", "myHookClass", function()
+	spawnmenu.AddToolTab( "Tab name!", "#Unique_Name", "icon16/wrench.png" )
 end )
