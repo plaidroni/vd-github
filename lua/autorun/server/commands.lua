@@ -158,110 +158,20 @@ end
 concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
 
 
-
-
-
-
-
---[[---------------------------------------------------------
-   Name:	VDAddWep
-   Desc:	Allows admins to add a model
------------------------------------------------------------]]  
-local function VDAddWep(player, command, wep)
-	if( !player:IsAdmin()) then return end
-	query = sql.Query("INSERT INTO VDInventory(model,gun,cost) VALUES('"..model[1].."', '"..model[2].."', '"..model[3].."');")
-	if not query then print(sql.LastError())
-	else print("Success!")
-	end		
-end
-concommand.Add("VDAddWep", VDAddWep, nil, "", {FCVAR_DONTRECORD})
-
-
-
---[[---------------------------------------------------------
-   Name:	VDViewWep
-   Desc:	Allows admins to add a model
------------------------------------------------------------]]  
-local function VDViewWep( player, command)
-	if ( !player:IsAdmin() ) then return end
-	--returns all positions into a table
-	res = sql.Query("SELECT row_number() OVER (ORDER BY gun) row_number,gun,model FROM VDInventory;")
-	if res then 
-		--prints to console
-		PrintTable(res)
-	else print(sql.LastError()) end
-end
-concommand.Add( "VDViewWep", VDViewWep, nil, "", {FCVAR_DONTRECORD} )
-
---[[---------------------------------------------------------
-   Name:	VDClearWep
-   Desc:	Allows admins to delete all models
------------------------------------------------------------]]  
-local function VDClearWep(player, command)
-	if( !player:IsAdmin()) then return end
-	sql.Query("DELETE FROM VDInventory;")	
-end
-concommand.Add( "VDClearWep", VDClearWep, nil, "", {FCVAR_DONTRECORD} )
-
-
---[[---------------------------------------------------------
-   Name:	VDDeleteWep
-   Desc:	Allows admins to delete specific models
------------------------------------------------------------]]  
-local function VDDeleteWep(player, command, name)
-	if( !player:IsAdmin()) then return end
-	--Checks if inputted Model is in the db
-	result = sql.Query("SELECT gun FROM VDInventory WHERE Name = '".. name[1] .."';")
-	if result then
-		--Deletes selected name
-		query = sql.Query("DELETE FROM VDInventory WHERE Name = '".. name[1] .."';")
-		if query then
-			print(name[1].. " sucessfully deleted!")
-		end
-	else print("No such model exists!")
-	end	
-end
-concommand.Add( "VDDeleteWep", VDDeleteWep, nil, "", {FCVAR_DONTRECORD} )
-
-
-
-
-
-
 --[[---------------------------------------------------------
    Name:	VDHelp
    Desc:	Help
 -----------------------------------------------------------]]  
 local function VDHelp( player, command)
-	--Pos
-	print("")
-	print("")
-	print("")
-	print("")
-	print("Position:")
-	print("")
 	print("VDSetPos String Name -- Sets the position of the Vector Dealer with look angle and position")
 	print("VDDeletePos String Name -- Deletes a specific position of the Vector Dealer")
 	print("VDViewPos -- Displays a table of all positions according to map and name")
 	print("VDClearPos -- Clears all of the positions in the table")
-	--Model
-	print("")
-	print("")
-	print("Model:")
-	print("")
-	print("VDAddModel String Path, String Name -- (format as 'models/MODEL.mdl') allows the admin to add a model")
+	print("VDAddModel String Path, String Name -- (format as 'models/MODEL.mdl') allows the admin to set the model")
 	print("VDViewModel String Name -- displays all of the models in the DB")
 	print("VDSetModel String Name -- sets the current model in accordance to the name")
+	print("VDViewModel -- Displays currently set model and models stored")
 	print("VDClearModel -- Deletes all models from the database")
 	print("VDDeleteModel String Name -- Deletes model with specified name")
-	--Gun
-	print("")
-	print("")
-	print("Gun:")
-	print("")
-	print("VDAddWep String model String gun Int price -- (format as 'models/MODEL.mdl') allows admins to add a weapon to the VDShop")
-	print("VDViewWep -- Displays all guns in the shop")
-	print("VDClearWep -- Deletes all guns from the database")
-	print("VDDeleteWep String gun -- Deletes the gun with specified name")
 end
 concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )

@@ -131,13 +131,12 @@ end
 
 
 net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
-    print(VDInventory.Prices[wepindex])
     wepindex = net.ReadInt(24)
-    moneyamount = sql.QueryValue("SELECT money FROM VDCoin WHERE name = '"..ply:SteamID().."';")
+    moneyamount = ply:getDarkRPVar("money")
     --fucking dumbshit
     if moneyAmount >= VDInventory.Prices[wepindex] then    
         if moneyAmount - VDInventory.Prices[wepindex] > 0 then
-            sql.Query("INSERT INTO VDCoins(money) VALUES('"..moneyAmount - VDInventory.Prices[wepindex].."') WHERE name='"..ply:SteamID().."';")
+            ply:setDarkRPVar( "money", moneyamount - VDInventory.Prices[wepindex])
             local gun = ents.Create( VDInventory.Items[wepindex] )
             gun:SetPos( ply:GetPos() + Vector(0,0,100))
             hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
