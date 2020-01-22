@@ -62,6 +62,8 @@ net.Receive("TableSend", function()
     end
     --this is so we can decide how to draw the menu based on the items
     VDInventory.numberOfItems = #VDInventory.Items
+    print(VDInventory.numberOfItems)
+
 end)
 
 
@@ -167,7 +169,6 @@ function VDMenu.showMenu( )
 
 
     for i = 1, VDInventory.numberOfItems do
-        
         local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 50
         local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
 
@@ -188,18 +189,23 @@ function VDMenu.showMenu( )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
 
+
+        --This is references in memory so accessing any gun info is based on index when originally
+        --Created... cool!
         icon.DoClick = function()
             LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
-            VDMenu.BuyButton:SetText(icon:GetModel())
+            VDMenu.BuyButton:SetText(LNBuyText)
         end
---"Buy for $"..VDInventory.Prices[i].."?"
+
+
+
     VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
         VDMenu.BuyButton:SetText( "Sample Text UwU" )
         VDMenu.BuyButton:SetPos( 0,0 )
         VDMenu.BuyButton:SetSize( ScrW() / 1.5, ScrH() / 5 )
         VDMenu.BuyButton.DoClick = function()
             net.Start("vectordealer_BuyWeapon")
-            net.WriteInt(clickedItem, 24) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
+            net.WriteInt(clickedItem, i) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
         end
         VDMenu.Frame:MoveToFront() 
