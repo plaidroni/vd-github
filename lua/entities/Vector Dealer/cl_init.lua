@@ -173,7 +173,7 @@ function VDMenu.showMenu( )
 
         local icon = vgui.Create( "DModelPanel", VDMenu.Frame )
 
-        icon:SetSize( ScrH()/9, ScrW()/16)
+        icon:SetSize( ScrH()/4, ScrW()/8)
         xz,yz = icon:GetSize()
         icon:SetPos(x - xz/4, y - yz/2.25)
         icon:SetModel( VDInventory.Models[i] ) -- you can only change colors on playermodels
