@@ -191,10 +191,10 @@ function VDMenu.showMenu( )
         icon.DoClick = function()
             timer.Simple(.7,function()
                 LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
-                VDMenu.BuyButton:SetText("Buy for $"..VDInventory.Prices[i].."?")
+                VDMenu.BuyButton:SetText(icon:GetModel())
             end)
         end
-
+--"Buy for $"..VDInventory.Prices[i].."?"
     VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
         VDMenu.BuyButton:SetText( "Sample Text UwU" )
         VDMenu.BuyButton:SetPos( 0,0 )
