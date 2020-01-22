@@ -28,7 +28,6 @@ net.Receive("TableSend", function()
         for k,v in pairs(guns[i]) do
                --[[
                 format is this lol
-
                 guns = {
                 1 = {String model1, String item1, Int price1},
                 2 = {String model2, String item2, Int price2},
@@ -37,11 +36,8 @@ net.Receive("TableSend", function()
                 5 = {String model5, String item5, Int price5},
                 6 = {String model6, String item6, Int price6}
                 }
-
                 so when we are looping below we can do it like this
-
                 gun[1] == {String model1, String item1, Int price1} --> gun[1][1] == String model1
-
                 this is so we can store the same index for the same gun but in differing tables
                 so index 1 is always gun 1 for all tables
                ]]
@@ -130,8 +126,9 @@ function VDMenu.showMenu( )
             for i = 1, VDInventory.numberOfItems+1 do
                 local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i +countdown ) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
                 local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i +countdown) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
+                print(drawOutLine)
                 local x2 = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300
-                local y2 = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300
+                local y2 = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300 
                        
                 local ang1 = (i-1)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
                 local ang2 = (i-0)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
@@ -166,7 +163,7 @@ function VDMenu.showMenu( )
         size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
         size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
         VDSit:SetFOV( 45 )
-        VDSit:SetCamPos( Vector( size, size, size ) )
+        VDSit:SetCamPos( Vector( size+45,size-90,size ) )
         VDSit:SetLookAt( ( mn + mx ) * 0.5 )
     for i = 1, VDInventory.numberOfItems do
         
@@ -264,12 +261,10 @@ end
         VDMenu.Frame:ShowCloseButton(true)
         VDMenu.Frame:SetDraggable(false)
         VDMenu.Frame:MakePopup()
-
         --honestly no fuckign clue but i think this sets tabs
         LNFx, LNFy = VDMenu.Frame:GetPos()
         VDMenu.Sheet = vgui.Create( "DPropertySheet", VDMenu.Frame)
         VDMenu.Sheet:Dock( FILL )
-
         --this adds a little boxy guy
     VDMenu.Text.Title = vgui.Create("DLabel", VDMenu.Frame)
         VDMenu.Text.Title:SetSize(VDMenu.Frame:GetWide() * .4, VDMenu.Frame:GetTall() * 0.234375)
@@ -279,15 +274,11 @@ end
         VDMenu.Text.Title:SetTextColor(Color(255,255,255,255))
         VDMenu.Text.Title:SetWrap(true)
         VDMenu.Text.Title:SetContentAlignment(8)
-
-
 -------------------------ITEM LIST---------------------------------------
-
     --allows you to have the thing scroll
     VDMenu.Frame.Scroll = vgui.Create( "DScrollPanel", VDMenu.Frame )
         VDMenu.Frame.Scroll:SetPos(VDMenu.Frame:GetWide() * 0.5078125, VDMenu.Frame:GetWide() * 0.060)
         VDMenu.Frame.Scroll:SetSize(VDMenu.Frame:GetWide() * 0.46875, VDMenu.Frame:GetTall() * 0.8792)
-
     --this is setting up for icon creation
     VDMenu.Frame.List = vgui.Create( "DIconLayout", VDMenu.Frame.Scroll )
         VDMenu.Frame.List:SetSpaceY( VDMenu.Frame:GetWide() * 0.00390625 ) -- Sets the space in between the panels on the Y Axis by 5
@@ -303,7 +294,6 @@ end
         VDMenu.BuyButtonFrame:ShowCloseButton(false)
         VDMenu.BuyButtonFrame:SetDraggable(false)
         VDMenu.BuyButtonFrame:MakePopup()
-
     VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.BuyButtonFrame )
         VDMenu.BuyButton:SetText( "Sample Text UwU" )
         VDMenu.BuyButton:SetPos( 0,0 )
@@ -315,18 +305,15 @@ end
             net.SendToServer()
         end
         VDMenu.Frame:MoveToFront()
-
     --making sure this shit ACTUALLY closes
     VDMenu.Frame.OnClose = function() 
         menuOpen = false
         VDMenu.BuyButtonFrame:Close()
     end
-
 --dude what the fuck does any of this shit mean maybe when you click on the item?
     local function Inspect(k)
         modelSet=true
         VDMenu.Panel.Icon:SetModel(VDInventory.Models[k])
-
         reRender()
         VDMenu.BuyButtonFrame:MoveTo(LNFx, ScrH() * -1510/-1920,.5,0,-1)
         timer.Simple(.7,function()
@@ -336,12 +323,8 @@ end
         end)
     end
     --yeah this shit is when you clikc on the item fuck man
-
-
-
     --looping through and adding the items
     for k,v in pairs(VDInventory.Items) do 
-
             icon = vgui.Create("SpawnIcon",VDMenu.Frame.List)
             icon:SetModel(VDInventory.Models[k])
             icon:SetSize( VDMenu.Frame:GetWide() * 0.06,  VDMenu.Frame:GetWide() * 0.06 )
@@ -352,7 +335,6 @@ end
                 clickedItem = k
                 Inspect(k)
             end
-
             --popup menu on rightclick 
             icon.DoRightClick = function(icon)
                 VDMenu.DropDown = DermaMenu()
@@ -368,52 +350,41 @@ end
                 end)
                 end
         end
-
-
 -------------------------D MODEL PANEL---------------------------------------
     
     --this is to make that little fucker pretty (づ｡◕‿‿◕｡)づ
-
     --panel creation for inventory
     VDMenu.Panel = vgui.Create( "DPanel" , VDMenu.Frame)
         VDMenu.Panel:SetPos( VDMenu.Frame:GetWide()*0.007, VDMenu.Frame:GetWide()*0.007 )
         VDMenu.Panel:SetSize( VDMenu.Frame:GetWide()* 0.546, VDMenu.Frame:GetWide()* 0.546 )
         VDMenu.Panel:SetBackgroundColor( Color( 0, 0, 0, 0 ) )
         VDMenu.Sheet:AddSheet("",VDMenu.Panel,false,false,"Inventory")
-
     --model for the panel
     VDMenu.Panel.Icon = vgui.Create( "DModelPanel", VDMenu.Panel )
         VDMenu.Panel.Icon:SetSize( VDMenu.Frame:GetWide()* 0.546, VDMenu.Frame:GetWide()* 0.546 )
         VDMenu.Panel.Icon:SetModel( "models/props_c17/statue_horse.mdl" )
         reRender()
-
     --other panel creation for cosmetics
     VDMenu.Panel2 = vgui.Create( "DPanel" , VDMenu.Frame)
         VDMenu.Panel2:SetPos( VDMenu.Frame:GetWide()*0.007, VDMenu.Frame:GetWide()*0.007 )
         VDMenu.Panel2:SetSize( VDMenu.Frame:GetWide()* 0.546, VDMenu.Frame:GetWide()* 0.546 )
         VDMenu.Panel2:SetBackgroundColor( Color( 0, 0, 0, 0 ) )
         VDMenu.Sheet:AddSheet("",VDMenu.Panel2,false,false,"Cosmetics")
-
     
     
-
 ----------------------Painting the Menu----------------------------------
        
-
 --this is to make that little fucker pretty (づ｡◕‿‿◕｡)づ
-
 --paint the main bitch
 function VDMenu.Frame:Paint(w, h)
     draw.RoundedBoxEx(3, 0, 0, w, h, Color(150,0,0,225), true, true, true, true)
     VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
 end
-
 --button frame pretty (づ｡◕‿‿◕｡)づ
 function VDMenu.BuyButtonFrame:Paint(w, h)
     draw.RoundedBoxEx(3, 0, 0, w, h, Color(0,200,0,225), true, true, true, true)
     VDMenu.blur( VDMenu.BuyButtonFrame, 15, 20, 255 )
 end
-
 --buy button pretty (づ｡◕‿‿◕｡)づ
 function VDMenu.BuyButton:Paint(w, h)
     draw.RoundedBoxEx(3, 0, 0, w, h, Color(0,200,0,0), true, true, true, true)
