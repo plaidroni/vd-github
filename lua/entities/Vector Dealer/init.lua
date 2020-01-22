@@ -11,9 +11,9 @@ util.AddNetworkString("TableSend")
 -- CONFIG
 
 VDInventory = {}
-VDInventory.Items = {"weapon_pistol", "weapon_357", "ls_sniper"} -- all prices, models, and items must be same index of corresponding item
-VDInventory.Models = {"models/weapons/w_pist_usp.mdl", "models/weapons/w_pist_usp.mdl", "models/weapons/w_snip_sg550.mdl"} -- all prices, models, and items must be same index of corresponding item
-VDInventory.Prices = {2500,500,7000} -- all prices, models, and items must be same index of corresponding item
+VDInventory.Items = {} 
+VDInventory.Models = {} 
+VDInventory.Prices = {}
 model = sql.QueryValue("SELECT Model FROM VDSetModel;")
 game.AddParticles( "gmod_effects.pcf" )
 PrecacheParticleSystem( "generic_smoke" )
@@ -130,27 +130,39 @@ end
 
 
 
-net.Receive("vectordealer_BuyWeapon", function(len, ply, wepindex)
-    print(VDInventory.Prices[wepindex])
-    wepindex = net.ReadInt(24)
-    moneyamount = sql.QueryValue("SELECT money FROM VDCoin WHERE name = '"..ply:SteamID().."';")
+net.Receive("vectordealer_BuyWeapon", function( wepindex, ply)
+    moneyAmount = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
+    moneyAmount = tonumber(moneyAmount)
+    print(moneyAmount)
+    print(VDInventory.Prices[1])
+    print(wepindex)
+    print(VDInventory.Prices[3])
     --fucking dumbshit
-    if moneyAmount >= VDInventory.Prices[wepindex] then    
-        if moneyAmount - VDInventory.Prices[wepindex] > 0 then
-            sql.Query("INSERT INTO VDCoins(money) VALUES('"..moneyAmount - VDInventory.Prices[wepindex].."') WHERE name='"..ply:SteamID().."';")
-            local gun = ents.Create( VDInventory.Items[wepindex] )
-            gun:SetPos( ply:GetPos() + Vector(0,0,100))
-            hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
-                if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
-            end )
-            
-            gun:Spawn()
-            
-            net.Start("vectordealer_CloseFrame")
-            net.Send(ply)
+    --if we dont got shit in the database and somethign is really  fucked
+    if moneyAmount then
+        if moneyAmount >= VDInventory.Prices[wepindex] then    
+            if moneyAmount - VDInventory.Prices[wepindex] > 0 then
+                sql.Query("INSERT INTO VDCoins(money) VALUES('"..moneyAmount - VDInventory.Prices[wepindex].."') WHERE name='"..ply:SteamID().."';")
+                local gun = ents.Create( VDInventory.Items[wepindex] )
+                gun:SetPos( ply:GetPos() + Vector(0,0,100))
+                hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
+                    if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
+                end )
+                
+                gun:Spawn()
+                
+                net.Start("vectordealer_CloseFrame")
+                net.Send(ply)
+            end
+        else 
+           
+
+            --SEVAN DO SOMETHING TO ANIMATE THE MENU HERE ??? 
+            print("gay")
+            --CALLED WHEN TRY TO BUY SOMETHING BUT NO MONIES
+
         end
     end
-   
 end)
 
 
@@ -255,7 +267,7 @@ function appendToInv(guns)
 
             elseif x == 3 then
                         
-                table.insert(VDInventory.Prices,  v)
+                table.insert(VDInventory.Prices,  tonumber(v))
                 x = 1
 
             else return 

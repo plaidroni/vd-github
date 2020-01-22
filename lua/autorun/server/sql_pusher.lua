@@ -88,9 +88,6 @@ function tables_exist()
     end
 
 
-
-
-
 end
 
  
@@ -98,7 +95,17 @@ function Initialize()
     tables_exist()
 end
 
+function PlayerInitialSpawn( ply )
+    
+    res = sql.Query("SELECT Name FROM VDCOIN WHERE Name = '"..ply:SteamID().."';")
+    if not res then
+        sql.Query("INSERT INTO VDCOIN( Name, Money ) VALUES ('"..ply:SteamID().."', 0);")
+    end
+
+end
+
  
 ------------------------Hooks--------------------------------------------------
  
 hook.Add( "Initialize", "Initialize", Initialize)
+hook.Add("PlayerInitialSpawn", "PlayerInitialSpawn", PlayerInitialSpawn)
