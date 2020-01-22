@@ -1,7 +1,11 @@
 ENT.Type = "ai"
 ENT.Base = "base_ai"
-ENT.PrintName = "vectordealer"
-ENT.Author = "plaidroni"
+ENT.PrintName = "Vector Dealer"
+ENT.Author = "plaidroni & tobias"
+ENT.Purpose = "retard"
+ENT.Category = "Vector Dealer"
+
+
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
 
