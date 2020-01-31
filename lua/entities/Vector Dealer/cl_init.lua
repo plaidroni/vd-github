@@ -62,8 +62,6 @@ net.Receive("TableSend", function()
     end
     --this is so we can decide how to draw the menu based on the items
     VDInventory.numberOfItems = #VDInventory.Items
-    print(VDInventory.numberOfItems)
-
 end)
 
 
@@ -101,11 +99,13 @@ function VDMenu.showMenu( )
 -------------------------FRAME---------------------------------------
     --effects based on clicking on VDealer
     
+
+
     x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     menuOpen = true
-
+    
     VDMenu.Frame = vgui.Create("DFrame")
     VDMenu.Frame:SetPos(0,0)
     VDMenu.Frame:SetSize(ScrW(), ScrH())
@@ -114,16 +114,40 @@ function VDMenu.showMenu( )
     VDMenu.Frame:SetTitle("")
     VDMenu.Frame:MakePopup()
     countdown = 100
+    eyecountdown = 20
+    local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
+
+        VDSit:SetSize( ScrH()/6, ScrW()/10.666)
+        xz,yz = VDSit:GetSize()
+        VDSit:SetPos((ScrW() / 2) - xz/2.05, (ScrH() / 2) - yz/1.5)
+        VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
+        function VDSit:LayoutEntity( Entity ) return end
     VDMenu.Frame.Paint = function()
+        
+        --[[function VDSit:LayoutEntity( e )  
+            e:SetSequence( 351 )
+            if e:GetCycle() >= 0.98 then 
+                e:SetCycle( 0.02 ) 
+            end
+            VDSit:RunAnimation()
+        end ]]--
+
+        function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
+        eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
+        local eyepos = Vector(0, 0, eyecountdown) + VDSit.Entity:GetBonePosition(VDSit.Entity:LookupBone("ValveBiped.Bip01_Head1"))
+        VDSit:SetLookAt(eyepos)
+        VDSit:SetCamPos(eyepos-Vector(-20, 0, 0)) -- Move cam in front of eyes
+        VDSit.Entity:SetEyeTarget(eyepos-Vector(-12, 0, 0))
+
         VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
     --grabs the number of items from the soon to be sql table
     
         surface.SetDrawColor( 50, 50, 50, 150 )
         surface.DrawRect( 0, 0, VDMenu.Frame:GetWide(), VDMenu.Frame:GetTall() )
-        
         surface.SetDrawColor( 200, 200, 200, 255 )
+
+        --surface.DrawLine(((ScrW() / 2) - xz/2.05) + xz,((ScrH() / 2) - yz/1.5) + yz,((ScrW() / 2) - xz/2.05) + xz,((ScrH() / 2) - yz/1.5) + yz)
         if VDInventory.numberOfItems > 1 then
-            
             countdown = Lerp(FrameTime(), countdown, 0 )
             for i = 1, VDInventory.numberOfItems+1 do
                 local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i +countdown ) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
@@ -142,39 +166,16 @@ function VDMenu.showMenu( )
     timer.Simple(5,function()
             VDMenu.Frame:Close()
         end)
-    local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
-
-        VDSit:SetSize( ScrH()/9, ScrW()/16)
-        xz,yz = VDSit:GetSize()
-        VDSit:SetPos((ScrW() / 2) - xz/4, (ScrH() / 2) - yz/2.25)
-        VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
-        
-        function VDSit:LayoutEntity( e )  
-            e:SetSequence( 351 )
-            if e:GetCycle() >= 0.98 then 
-                e:SetCycle( 0.02 ) 
-            end
-            VDSit:RunAnimation()
-        end 
-
-        function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
-        local mn, mx = VDSit.Entity:GetRenderBounds()
-        local size = mx.x * 2
-        size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
-        size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
-        size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
-        VDSit:SetFOV( 45 )
-        VDSit:SetCamPos( Vector( size+45,size-90,size ) )
-        VDSit:SetLookAt( ( mn + mx ) * 0.5 )
 
 
     for i = 1, VDInventory.numberOfItems do
+        
         local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 50
         local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
 
         local icon = vgui.Create( "DModelPanel", VDMenu.Frame )
 
-        icon:SetSize( ScrH()/4, ScrW()/8)
+        icon:SetSize( ScrH()/9, ScrW()/16)
         xz,yz = icon:GetSize()
         icon:SetPos(x - xz/4, y - yz/2.25)
         icon:SetModel( VDInventory.Models[i] ) -- you can only change colors on playermodels
@@ -189,23 +190,18 @@ function VDMenu.showMenu( )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
 
-
-        --This is references in memory so accessing any gun info is based on index when originally
-        --Created... cool!
         icon.DoClick = function()
             LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
-            VDMenu.BuyButton:SetText(LNBuyText)
+            VDMenu.BuyButton:SetText(icon:GetModel())
         end
-
-
-
+--"Buy for $"..VDInventory.Prices[i].."?"
     VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
         VDMenu.BuyButton:SetText( "Sample Text UwU" )
         VDMenu.BuyButton:SetPos( 0,0 )
         VDMenu.BuyButton:SetSize( ScrW() / 1.5, ScrH() / 5 )
         VDMenu.BuyButton.DoClick = function()
             net.Start("vectordealer_BuyWeapon")
-            net.WriteInt(clickedItem, i) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
+            net.WriteInt(clickedItem, 24) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
         end
         VDMenu.Frame:MoveToFront() 
