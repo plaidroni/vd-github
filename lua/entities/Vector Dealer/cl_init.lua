@@ -115,6 +115,8 @@ function VDMenu.showMenu( )
     VDMenu.Frame:MakePopup()
     countdown = 100
     eyecountdown = 20
+    buylist = {}
+    VDbuylistLines = {}
     local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
 
         VDSit:SetSize( ScrH()/6, ScrW()/10.666)
@@ -138,10 +140,8 @@ function VDMenu.showMenu( )
         VDSit:SetLookAt(eyepos)
         VDSit:SetCamPos(eyepos-Vector(-20, 0, 0)) -- Move cam in front of eyes
         VDSit.Entity:SetEyeTarget(eyepos-Vector(-12, 0, 0))
-
         VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
     --grabs the number of items from the soon to be sql table
-    
         surface.SetDrawColor( 50, 50, 50, 150 )
         surface.DrawRect( 0, 0, VDMenu.Frame:GetWide(), VDMenu.Frame:GetTall() )
         surface.SetDrawColor( 200, 200, 200, 255 )
@@ -154,7 +154,6 @@ function VDMenu.showMenu( )
                 local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i +countdown) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 100
                 local x2 = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300
                 local y2 = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i + countdown/2) + math.rad( 360/(VDInventory.numberOfItems)/2 ) ) * 300 
-                       
                 local ang1 = (i-1)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
                 local ang2 = (i-0)*(360/VDInventory.numberOfItems) + (360/VDInventory.numberOfItems/2)
                 surface.SetDrawColor( 255, 255, 255, 255)
@@ -166,7 +165,15 @@ function VDMenu.showMenu( )
     timer.Simple(5,function()
             VDMenu.Frame:Close()
         end)
-
+    function updateList(item, index)
+        for k,v in pairs(buylist) do
+            surface.SetFont( "Default" )
+            surface.SetTextColor( 255, 255, 255 )
+            surface.SetTextPos( 128, 128 ) 
+            surface.DrawText( "Hello World" )
+            print("hello")
+        end
+    end
 
     for i = 1, VDInventory.numberOfItems do
         
@@ -192,10 +199,12 @@ function VDMenu.showMenu( )
 
         icon.DoClick = function()
             LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
-            VDMenu.BuyButton:SetText(icon:GetModel())
+            --VDMenu.BuyButton:SetText(icon:GetModel())
+            table.insert(buylist, VDInventory.Items[i])
+            updateList(VDInventory.Items[i], i)
         end
 --"Buy for $"..VDInventory.Prices[i].."?"
-    VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
+    --[[VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
         VDMenu.BuyButton:SetText( "Sample Text UwU" )
         VDMenu.BuyButton:SetPos( 0,0 )
         VDMenu.BuyButton:SetSize( ScrW() / 1.5, ScrH() / 5 )
@@ -203,9 +212,10 @@ function VDMenu.showMenu( )
             net.Start("vectordealer_BuyWeapon")
             net.WriteInt(clickedItem, 24) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
-        end
-        VDMenu.Frame:MoveToFront() 
+        end]]--
     end
+
+    VDMenu.Frame:MoveToFront() 
 end
 
 
