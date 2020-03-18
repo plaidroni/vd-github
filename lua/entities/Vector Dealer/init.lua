@@ -52,7 +52,7 @@ function ENT:Initialize()
     getVDInventory()
     self:SetModel( model )
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
-    self:CapabilitiesAdd( CAP_TURN_HEAD )
+   -- self:CapabilitiesAdd( CAP_TURN_HEAD )
     self:SetSchedule( SCHED_NPC_FREEZE )
     
     self:SetHullType( HULL_HUMAN )
