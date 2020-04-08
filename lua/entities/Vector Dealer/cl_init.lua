@@ -90,6 +90,7 @@ LNBuyText = "text"
 local menuOpen = false
 local modelSet = false
 local clickedItem = 0
+local cartbool = false
 
 
 --initialization of the menu itself
@@ -99,7 +100,7 @@ function VDMenu.showMenu( )
     --effects based on clicking on VDealer
     
 
-
+    cartbool=true
     x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
@@ -114,6 +115,7 @@ function VDMenu.showMenu( )
     VDMenu.Frame:MakePopup()
     countdown = 100
     eyecountdown = 20
+    buylist = {}
     buylist.cart = {}
     buylist.index = {}
     VDbuylistLines = {}
@@ -232,6 +234,29 @@ function VDMenu.showMenu( )
     VDMenu.Frame:MoveToFront() 
 end
 
+--Shopping Cart---------------------------------------------------------------------------------------
+--[[VDMenu.CartScreen = vgui.Create( "DPanel" , VDMenu.Frame)
+    VDMenu.CartScreen:SetSize(500,200)
+    VDMenu.CartScreen:Dock(RIGHT)
+    VDMenu.CartScreen:SetVisible(true)
+    --VDMenu.CartScreen:ShowCloseButton(false)
+    --VDMenu.CartScreen:SetSizable(false)
+    --VDMenu.CartScreen:SetIcon("")
+    --VDMenu.CartScreen:SetDraggable(false)
+    --VDMenu.CartScreen:SetTitle("Cart")
+    
+
+VDMenu.CartScreenLabel = vgui.Create("Dlabel", VDMenu.CartScreen)
+    --VDMenu.CartScreenLabel:SetPos(10,10)
+    --VDMenu.CartScreenLabel:SetText("Yellow")
+    
+   
+
+]]
+
+
+
+
 
 
 
@@ -258,7 +283,7 @@ end
 
 
 
---open the menu
+--[[open the menu
 function VDMenu.KeyPress( ply , bind, pressed)
     if (bind == "gm_showspare2" && (not menuOpen)) then
         VDMenu.showMenu( )
@@ -273,7 +298,7 @@ hook.Add("PlayerBindPress", "VDMenu.KeyPress", VDMenu.KeyPress)
    
 net.Receive("vectordealer_AlertPlayers", function()
    
-end)
+end)]]
    
 function ENT:Draw()
 --made by me tobias too mother fucker some of this dogshit code is mine ):<
@@ -282,14 +307,4 @@ function ENT:Draw()
    
     --------------------------------
  
-end
-
-
-
-function indexof(values,item)
-    local index = {}
-    for k,v in pairs(values) do
-        index[v] = k
-    end
-    return index[item]
 end
