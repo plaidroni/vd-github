@@ -101,12 +101,9 @@ concommand.Add("VDAddModel", VDAddModel, nil, "", {FCVAR_DONTRECORD})
 -----------------------------------------------------------]]  
 local function VDSetModel( player, command, model)
 	if( !player:IsAdmin()) then return end
-	res = sql.QueryValue("SELECT Model FROM VDModel WHERE Name = '"..model[1].."';")
-	if res then
-	sql.Query("DELETE FROM VDSetModel;")
-	query = sql.Query("INSERT INTO VDSetModel(Model, Name) VALUES('"..res.."','"..model[1].."');")
-	print("Success!")
-	else print(sql.LastError()) end
+	
+	res = sql.QueryValue("UPDATE VDModel SET Model = '"..model[1].."' WHERE Name = '"..model[1].."';")
+	
 end
 concommand.Add( "VDSetModel", VDSetModel, nil, "", {FCVAR_DONTRECORD} )
 
@@ -225,6 +222,17 @@ concommand.Add( "VDDeleteWep", VDDeleteWep, nil, "", {FCVAR_DONTRECORD} )
 
 
 
+--[[---------------------------------------------------------
+   Name:	VDSetCoins
+   Desc:	Allows admins to set coins 
+-----------------------------------------------------------]]  
+local function VDSetCoins( player, command, money)
+	if( !player:IsAdmin()) then return end
+	
+	res = sql.QueryValue("UPDATE VDCoin SET Money = '"..money[1].."' WHERE Name = '"..player:SteamID().."';")
+	
+end
+concommand.Add( "VDSetCoins", VDSetCoins, nil, "", {FCVAR_DONTRECORD} )
 
 
 

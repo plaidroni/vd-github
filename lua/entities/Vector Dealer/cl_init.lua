@@ -91,7 +91,6 @@ local menuOpen = false
 local modelSet = false
 local clickedItem = 0
 
- -- Made by plaidroni & Tobias
 
 --initialization of the menu itself
 
@@ -125,15 +124,6 @@ function VDMenu.showMenu( )
         VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
         function VDSit:LayoutEntity( Entity ) return end
     VDMenu.Frame.Paint = function()
-        
-        --[[function VDSit:LayoutEntity( e )  
-            e:SetSequence( 351 )
-            if e:GetCycle() >= 0.98 then 
-                e:SetCycle( 0.02 ) 
-            end
-            VDSit:RunAnimation()
-        end ]]--
-
         function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
         local eyepos = Vector(0, 0, eyecountdown) + VDSit.Entity:GetBonePosition(VDSit.Entity:LookupBone("ValveBiped.Bip01_Head1"))
@@ -141,6 +131,7 @@ function VDMenu.showMenu( )
         VDSit:SetCamPos(eyepos-Vector(-20, 0, 0)) -- Move cam in front of eyes
         VDSit.Entity:SetEyeTarget(eyepos-Vector(-12, 0, 0))
         VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
+   
     --grabs the number of items from the soon to be sql table
         surface.SetDrawColor( 50, 50, 50, 150 )
         surface.DrawRect( 0, 0, VDMenu.Frame:GetWide(), VDMenu.Frame:GetTall() )
@@ -165,13 +156,13 @@ function VDMenu.showMenu( )
     timer.Simple(5,function()
             VDMenu.Frame:Close()
         end)
+
     function updateList(item, index)
         for k,v in pairs(buylist) do
             surface.SetFont( "Default" )
             surface.SetTextColor( 255, 255, 255 )
             surface.SetTextPos( 128, 128 ) 
             surface.DrawText( "Hello World" )
-            print("hello")
         end
     end
 
@@ -197,22 +188,28 @@ function VDMenu.showMenu( )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
 
-        icon.DoClick = function()
-            LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
-            --VDMenu.BuyButton:SetText(icon:GetModel())
-            table.insert(buylist, VDInventory.Items[i])
-            updateList(VDInventory.Items[i], i)
-        end
-        text = "Buy for $"..VDInventory.Prices[i].."?"
+       
+        ---text = "Buy for $"..VDInventory.Prices[i].."?"
         VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
-        VDMenu.BuyButton:SetText( text )
+        VDMenu.BuyButton:SetText( "ur mom" )
         VDMenu.BuyButton:SetPos( 0,0 )
         VDMenu.BuyButton:SetSize( ScrW() / 15, ScrH() / 25 )
+
         VDMenu.BuyButton.DoClick = function()
             net.Start("vectordealer_BuyWeapon")
             net.WriteInt(clickedItem, 1) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
         end
+
+        --clicking on the item itself sets the next to whatever the curr clicked item
+        icon.DoClick = function()
+            LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
+            VDMenu.BuyButton:SetText(""..VDInventory.Items[i])
+            --indexes to current shoppingcart
+            table.insert(buylist, VDInventory.Items[i])
+            updateList(VDInventory.Items[i], i)
+        end
+
     end
 
     VDMenu.Frame:MoveToFront() 
