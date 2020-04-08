@@ -284,5 +284,12 @@ local function VDHelp( player, command)
 	print("VDViewWep -- Displays all guns in the shop")
 	print("VDClearWep -- Deletes all guns from the database")
 	print("VDDeleteWep String gun -- Deletes the gun with specified name")
+	--Coins
+	print("")
+	print("")
+	print("Coins:")
+	print("")
+	print("VDSetCoins Int Money -- It allows you to set your money")
+	print("VDViewCoins -- It allows you to view your money")
 end
 concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )
