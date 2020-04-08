@@ -94,6 +94,7 @@ local menuOpen = false
 local modelSet = false
 local clickedItem = 0
 local currMoney = 0
+local item = 0
 
 --initialization of the menu itself
 
@@ -217,8 +218,9 @@ function VDMenu.showMenu( )
         VDMenu.ShoppingCart:SetSize( ScrW() / 5, ScrH() / 25 )
 
         VDMenu.ShoppingCart.DoClick = function()
-            table.insert(buylist.cart, VDInventory.Items[i])
-            updateList(VDInventory.Items[i], i)
+            print(item)
+            table.insert(buylist.cart, item)
+            updateList(item, i)
             VDMenu.test:SetText(#buylist.cart)
             table.insert(buylist.index, i)
             UpdateCart(buylist.cart,i, currMoney)
@@ -226,7 +228,8 @@ function VDMenu.showMenu( )
 
         --clicking on the item itself sets the next to whatever the curr clicked item
         icon.DoClick = function()
-            VDMenu.ShoppingCart:SetText("Add "..VDInventory.Items[i].. " To Shopping Cart?")
+            item = VDInventory.Items[i]
+            VDMenu.ShoppingCart:SetText("Add "..item.. " To Shopping Cart?")
             --indexes to current shoppingcart
         end
 
