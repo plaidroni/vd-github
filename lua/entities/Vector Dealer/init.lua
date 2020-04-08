@@ -8,6 +8,7 @@ util.AddNetworkString("vectordealer_AlertPlayers")
 util.AddNetworkString("vectordealer_TimerOut")
 util.AddNetworkString("vectordealer_CloseFrame")
 util.AddNetworkString("TableSend")
+util.AddNetworkString( "MoneySend" )
 -- CONFIG
 
 VDInventory = {}
@@ -86,6 +87,16 @@ function ENT:Think()
     self:SetColor(Color(0,0,0,155))
 end
 net.Receive("vectordealer_TeleportCasino", function(len, ply)
+    
+
+    res=sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
+    if(res) then
+        net.Start("MoneySend")
+        net.WriteInt(res)
+        net.Send(ply)
+    end
+
+
     ply:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
     function teleport()
         ply:SetPos(Vector(1641.712646, -7108.523438, -134.968750))
@@ -99,7 +110,8 @@ end)
 function ENT:Use( Name, Caller )
     if Name:IsPlayer() then
         x,y,z  = Name:GetPos():Unpack()
-     
+        
+
         z = z + 60
         Name:Freeze(true)
         ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )

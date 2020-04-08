@@ -101,9 +101,6 @@ concommand.Add( "notificationadd", SendNotifToClients, nil, "Display an advert t
 
 
 
---this part is by TOBIAS i repeat not plaidroni this code is shit but commented™ code is mine (づ｡◕‿‿◕｡)づ
------------------------------I DONT KNOW HOW TO SHARE COMMANDS SO FUCK ME I GUESS LOL--------------------------------------------
-
 --Runs the start bounty function every 20 minutes
 
 t, predator, prey = {}

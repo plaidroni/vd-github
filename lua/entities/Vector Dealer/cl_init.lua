@@ -1,4 +1,5 @@
 include("shared.lua")
+
 VDMenu = {}
 VDMenu.Listings = {}
 VDMenu.Text = {}
@@ -12,6 +13,7 @@ VDInventory.Prices = {}
 VDInventory.numberOfItems = #VDInventory.Items
 --lol
 net.Receive("TableSend", function()
+
     --resets last inventory cycle
     VDInventory.Items = {} 
     VDInventory.Models = {} 
@@ -62,6 +64,7 @@ net.Receive("TableSend", function()
     end
     --this is so we can decide how to draw the menu based on the items
     VDInventory.numberOfItems = #VDInventory.Items
+
 end)
 
 
@@ -90,17 +93,21 @@ LNBuyText = "text"
 local menuOpen = false
 local modelSet = false
 local clickedItem = 0
-local cartbool = false
-
+local currMoney = 0
 
 --initialization of the menu itself
 
 function VDMenu.showMenu( )
 -------------------------FRAME---------------------------------------
     --effects based on clicking on VDealer
-    
+   
+    net.Receive("MoneySend",function(ply,money)
+        currMoney = Money
+    end)
 
-    cartbool=true
+
+
+
     x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
@@ -160,14 +167,7 @@ function VDMenu.showMenu( )
             VDMenu.Frame:Close()
         end)
 
-    function updateList(item, index)
-        for k,v in pairs(buylist.cart) do
-            surface.SetFont( "Default" )
-            surface.SetTextColor( 255, 255, 255 )
-            surface.SetTextPos( 128, 128 ) 
-            surface.DrawText( "Hello World" )
-        end
-    end
+    
 
     for i = 1, VDInventory.numberOfItems do
         
@@ -221,6 +221,7 @@ function VDMenu.showMenu( )
             updateList(VDInventory.Items[i], i)
             VDMenu.test:SetText(#buylist.cart)
             table.insert(buylist.index, i)
+            UpdateCart(buylist.cart,i, currMoney)
         end
 
         --clicking on the item itself sets the next to whatever the curr clicked item
@@ -289,9 +290,7 @@ function VDMenu.KeyPress( ply , bind, pressed)
         VDMenu.showMenu( )
     end
 end
-net.Receive("vectordealer_UsePanel", function( len )
-    VDMenu.showMenu()
-end)
+
 hook.Add("PlayerBindPress", "VDMenu.KeyPress", VDMenu.KeyPress)
 
 
@@ -304,7 +303,53 @@ function ENT:Draw()
 --made by me tobias too mother fucker some of this dogshit code is mine ):<
 --MADE BY plaidroni (http://steamcommunity.com/id/plaidroni/)
     self:DrawModel()
-   
+    
     --------------------------------
  
+end
+
+net.Receive("vectordealer_UsePanel", function( len )
+    VDMenu.showMenu()
+end)
+
+
+function UpdateCart(tbl,index, money)
+    PrintTable(tbl)
+    subtotal = Subtotal(tbl)
+    print("Balance: $"..""..money)
+    print("Subtotal: $"..subtotal)
+    print("New Balance: $"..money-subtotal)
+    print("")
+    print("")
+end
+
+function Subtotal()
+    subtotal = 0
+    for k,v in pairs(buylist.cart) do
+        index = indexof(VDInventory.Items,v)
+       
+      
+        price = VDInventory.Prices[index]
+
+        subtotal = subtotal + price
+    end
+    return subtotal
+end
+
+
+function indexof(values,item)
+    local index = {}
+    for k,v in pairs(values) do
+        index[v] = k
+    end
+    return index[item]
+end
+
+function updateList(item, index)
+        for k,v in pairs(buylist.cart) do
+            surface.SetFont( "Default" )
+            surface.SetTextColor( 255, 255, 255 )
+            surface.SetTextPos( 128, 128 ) 
+            surface.DrawText( "Hello World" )
+        end
 end
