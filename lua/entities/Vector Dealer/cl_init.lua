@@ -203,16 +203,16 @@ function VDMenu.showMenu( )
             table.insert(buylist, VDInventory.Items[i])
             updateList(VDInventory.Items[i], i)
         end
---"Buy for $"..VDInventory.Prices[i].."?"
-    --[[VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
-        VDMenu.BuyButton:SetText( "Sample Text UwU" )
+        text = "Buy for $"..VDInventory.Prices[i].."?"
+        VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
+        VDMenu.BuyButton:SetText( text )
         VDMenu.BuyButton:SetPos( 0,0 )
-        VDMenu.BuyButton:SetSize( ScrW() / 1.5, ScrH() / 5 )
+        VDMenu.BuyButton:SetSize( ScrW() / 15, ScrH() / 25 )
         VDMenu.BuyButton.DoClick = function()
             net.Start("vectordealer_BuyWeapon")
-            net.WriteInt(clickedItem, 24) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
+            net.WriteInt(clickedItem, 1) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
-        end]]--
+        end
     end
 
     VDMenu.Frame:MoveToFront() 
@@ -270,155 +270,3 @@ function ENT:Draw()
  
 end
 
-
-
-
-
-
-
-
-
-
-
---[[
-        --Setting the sizing to work with all resolutions, initialization
-    VDMenu.Frame = vgui.Create("DFrame")
-        VDMenu.Frame:SetSize( ScrW() / 1.5, ScrH() / 1.3)
-        VDMenu.Frame:Center()
-        VDMenu.Frame:SetTitle("")
-        VDMenu.Frame:ShowCloseButton(true)
-        VDMenu.Frame:SetDraggable(false)
-        VDMenu.Frame:MakePopup()
-        --honestly no fuckign clue but i think this sets tabs
-        LNFx, LNFy = VDMenu.Frame:GetPos()
-        VDMenu.Sheet = vgui.Create( "DPropertySheet", VDMenu.Frame)
-        VDMenu.Sheet:Dock( FILL )
-        --this adds a little boxy guy
-    VDMenu.Text.Title = vgui.Create("DLabel", VDMenu.Frame)
-        VDMenu.Text.Title:SetSize(VDMenu.Frame:GetWide() * .4, VDMenu.Frame:GetTall() * 0.234375)
-        VDMenu.Text.Title:SetPos(VDMenu.Frame:GetWide() * 0.2, VDMenu.Frame:GetTall() * 0.7)
-        VDMenu.Text.Title:SetFont("LividityTitle")
-        VDMenu.Text.Title:SetText("")
-        VDMenu.Text.Title:SetTextColor(Color(255,255,255,255))
-        VDMenu.Text.Title:SetWrap(true)
-        VDMenu.Text.Title:SetContentAlignment(8)
--------------------------ITEM LIST---------------------------------------
-    --allows you to have the thing scroll
-    VDMenu.Frame.Scroll = vgui.Create( "DScrollPanel", VDMenu.Frame )
-        VDMenu.Frame.Scroll:SetPos(VDMenu.Frame:GetWide() * 0.5078125, VDMenu.Frame:GetWide() * 0.060)
-        VDMenu.Frame.Scroll:SetSize(VDMenu.Frame:GetWide() * 0.46875, VDMenu.Frame:GetTall() * 0.8792)
-    --this is setting up for icon creation
-    VDMenu.Frame.List = vgui.Create( "DIconLayout", VDMenu.Frame.Scroll )
-        VDMenu.Frame.List:SetSpaceY( VDMenu.Frame:GetWide() * 0.00390625 ) -- Sets the space in between the panels on the Y Axis by 5
-        VDMenu.Frame.List:SetSpaceX( VDMenu.Frame:GetWide() * 0.00390625 ) -- Sets the space in between the panels on the X Axis by 5
-        VDMenu.Frame.List:SetPos(VDMenu.Frame:GetWide() * 0.0390625, 0 )
-        VDMenu.Frame.List:SetSize(VDMenu.Frame:GetWide() * 0.46875, VDMenu.Frame:GetWide() * 0.46875)
-   
-    --initialzation of button
-    VDMenu.BuyButtonFrame = vgui.Create("DFrame")
-        VDMenu.BuyButtonFrame:SetSize( ScrW() / 1.5, ScrH() / 15)
-        VDMenu.BuyButtonFrame:SetPos( VDMenu.Frame:GetPos(), ScrH() * -1510/-1920)
-        VDMenu.BuyButtonFrame:SetTitle("")
-        VDMenu.BuyButtonFrame:ShowCloseButton(false)
-        VDMenu.BuyButtonFrame:SetDraggable(false)
-        VDMenu.BuyButtonFrame:MakePopup()
-    VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.BuyButtonFrame )
-        VDMenu.BuyButton:SetText( "Sample Text UwU" )
-        VDMenu.BuyButton:SetPos( 0,0 )
-        VDMenu.BuyButton:SetSize( ScrW() / 1.5, ScrH() / 5 )
-        LNBx, LNBy = VDMenu.BuyButton:GetSize()
-        VDMenu.BuyButton.DoClick = function()
-            net.Start("vectordealer_BuyWeapon")
-            net.WriteInt(clickedItem, 24) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
-            net.SendToServer()
-        end
-        VDMenu.Frame:MoveToFront()
-    --making sure this shit ACTUALLY closes
-    VDMenu.Frame.OnClose = function() 
-        menuOpen = false
-        VDMenu.BuyButtonFrame:Close()
-    end
---dude what the fuck does any of this shit mean maybe when you click on the item?
-    local function Inspect(k)
-        modelSet=true
-        VDMenu.Panel.Icon:SetModel(VDInventory.Models[k])
-        reRender()
-        VDMenu.BuyButtonFrame:MoveTo(LNFx, ScrH() * -1510/-1920,.5,0,-1)
-        timer.Simple(.7,function()
-            LNBuyText = "Buy for $"..VDInventory.Prices[k].."?"
-            VDMenu.BuyButton:SetText("Buy for $"..VDInventory.Prices[k].."?")
-            VDMenu.BuyButtonFrame:MoveTo(LNFx,ScrH() * -1690/-1920,.5,0,-1)
-        end)
-    end
-    --yeah this shit is when you clikc on the item fuck man
-    --looping through and adding the items
-    for k,v in pairs(VDInventory.Items) do 
-            icon = vgui.Create("SpawnIcon",VDMenu.Frame.List)
-            icon:SetModel(VDInventory.Models[k])
-            icon:SetSize( VDMenu.Frame:GetWide() * 0.06,  VDMenu.Frame:GetWide() * 0.06 )
-            --VDMenu.Frame=VDMenu.Frame.List:Add(icon)
-           
-            --on click
-            icon.DoClick = function(icon)
-                clickedItem = k
-                Inspect(k)
-            end
-            --popup menu on rightclick 
-            icon.DoRightClick = function(icon)
-                VDMenu.DropDown = DermaMenu()
-                VDMenu.DropDown:MakePopup()
-                VDMenu.DropDown:SetFontInternal("LividityTEXT")
-                function VDMenu.DropDown:Paint(w, h)
-                    draw.RoundedBoxEx(3, 0, 0, w, h, Color(255,92,0,125), true, true, true, true)
-                end 
-                VDMenu.DropDown:SetPos(gui.MousePos())
-                VDMenu.DropDown:AddOption( "Inspect" , function() 
-                    clickedItem = k
-                    Inspect(k)
-                end)
-                end
-        end
--------------------------D MODEL PANEL---------------------------------------
-    
-    --this is to make that little fucker pretty (づ｡◕‿‿◕｡)づ
-    --panel creation for inventory
-    VDMenu.Panel = vgui.Create( "DPanel" , VDMenu.Frame)
-        VDMenu.Panel:SetPos( VDMenu.Frame:GetWide()*0.007, VDMenu.Frame:GetWide()*0.007 )
-        VDMenu.Panel:SetSize( VDMenu.Frame:GetWide()* 0.546, VDMenu.Frame:GetWide()* 0.546 )
-        VDMenu.Panel:SetBackgroundColor( Color( 0, 0, 0, 0 ) )
-        VDMenu.Sheet:AddSheet("",VDMenu.Panel,false,false,"Inventory")
-    --model for the panel
-    VDMenu.Panel.Icon = vgui.Create( "DModelPanel", VDMenu.Panel )
-        VDMenu.Panel.Icon:SetSize( VDMenu.Frame:GetWide()* 0.546, VDMenu.Frame:GetWide()* 0.546 )
-        VDMenu.Panel.Icon:SetModel( "models/props_c17/statue_horse.mdl" )
-        reRender()
-    --other panel creation for cosmetics
-    VDMenu.Panel2 = vgui.Create( "DPanel" , VDMenu.Frame)
-        VDMenu.Panel2:SetPos( VDMenu.Frame:GetWide()*0.007, VDMenu.Frame:GetWide()*0.007 )
-        VDMenu.Panel2:SetSize( VDMenu.Frame:GetWide()* 0.546, VDMenu.Frame:GetWide()* 0.546 )
-        VDMenu.Panel2:SetBackgroundColor( Color( 0, 0, 0, 0 ) )
-        VDMenu.Sheet:AddSheet("",VDMenu.Panel2,false,false,"Cosmetics")
-    
-    
-----------------------Painting the Menu----------------------------------
-       
---this is to make that little fucker pretty (づ｡◕‿‿◕｡)づ
---paint the main bitch
-function VDMenu.Frame:Paint(w, h)
-    draw.RoundedBoxEx(3, 0, 0, w, h, Color(150,0,0,225), true, true, true, true)
-    VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
-end
---button frame pretty (づ｡◕‿‿◕｡)づ
-function VDMenu.BuyButtonFrame:Paint(w, h)
-    draw.RoundedBoxEx(3, 0, 0, w, h, Color(0,200,0,225), true, true, true, true)
-    VDMenu.blur( VDMenu.BuyButtonFrame, 15, 20, 255 )
-end
---buy button pretty (づ｡◕‿‿◕｡)づ
-function VDMenu.BuyButton:Paint(w, h)
-    draw.RoundedBoxEx(3, 0, 0, w, h, Color(0,200,0,0), true, true, true, true)
-    VDMenu.blur( VDMenu.BuyButtonFrame, 15, 20, 255 )
-    surface.SetFont("LividityBuy")
-    draw.DrawText( LNBuyText, "LividityBuy", LNBx / 2 - surface.GetTextSize(LNBuyText) / 2, LNBy / 2 - 100, Color( 255, 255, 255, 255 ))
-end
-end
-]]
