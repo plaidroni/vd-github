@@ -130,40 +130,45 @@ end
 
 
 
-net.Receive("vectordealer_BuyWeapon", function( wepindex, ply)
-    moneyAmount = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
-    moneyAmount = tonumber(moneyAmount)
-
-    print(wepindex)
-    print(moneyAmount)
-    PrintTable(VDInventory.Items)
-    --fucking dumbshit
-    --if we dont got shit in the database and somethign is really  fucked
-
-    if moneyAmount then
-        if moneyAmount >= VDInventory.Prices[wepindex] then    
-            if moneyAmount - VDInventory.Prices[wepindex] > 0 then
-                sql.Query("INSERT INTO VDCoins(money) VALUES('"..moneyAmount - VDInventory.Prices[wepindex].."') WHERE name='"..ply:SteamID().."';")
-                local gun = ents.Create( VDInventory.Items[wepindex] )
-                print(gun)
-                gun:SetPos( ply:GetPos() + Vector(0,0,100))
-                hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
-                    if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
-                end )
-                
-                gun:Spawn()
-                
-                net.Start("vectordealer_CloseFrame")
-                net.Send(ply)
-            end
-        else 
+net.Receive("vectordealer_BuyWeapon", function( len, ply)    
+    
+    buylist = net.ReadTable()
+    
+    --OKAY SO BASICALLY THIS WHOLE THING IS LIKE REALLY NEAT SO WHAT THIS DOES IS RECIEVES THE SHOPPING CART TABLE AND THEN FINDS THE INDEX OF THE SPECIFIC ITEM IN THE
+    --SYSTEM THAT WE HAVE AND THEN CREATES AN ITEM PER ONE AND SUBTRACTS THE MONEY FROM IT AUTOMATICALLY ITS BEAUTIFUL
+    for k,v in pairs(buylist.cart) do
+        
+        --Variables
+        index = indexof(VDInventory.Items,v)
+        price = VDInventory.Prices[index]
+        moneyAmount = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
+        moneyAmount = tonumber(moneyAmount)
+        
+        --Checks to see if sql works
+        if moneyAmount then
+            --Checks to see if u have a balance
+            if moneyAmount >= price then    
+                    --subtracts money
+                    res=sql.Query("UPDATE VDCoin SET Money='"..moneyAmount - price .."' WHERE Name = '"..ply:SteamID().."';")
+                    --creates the gun to spawn
+                    local gun = ents.Create( VDInventory.Items[index] )
+                    gun:SetPos( ply:GetPos() + Vector(0,0,100))
+                    hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
+                        if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
+                    end )
+                    
+                    gun:Spawn()
+                    
+                    net.Start("vectordealer_CloseFrame")
+                    net.Send(ply)
+            else 
            
 
             --SEVAN DO SOMETHING TO ANIMATE THE MENU HERE ??? 
             print("gay")
             --CALLED WHEN TRY TO BUY SOMETHING BUT NO MONIES
-
         end
+    end
     end
 end)
 
@@ -280,3 +285,10 @@ function appendToInv(guns)
 end
 
 
+function indexof(values,item)
+    local index = {}
+    for k,v in pairs(values) do
+        index[v] = k
+    end
+    return index[item]
+end

@@ -114,7 +114,8 @@ function VDMenu.showMenu( )
     VDMenu.Frame:MakePopup()
     countdown = 100
     eyecountdown = 20
-    buylist = {}
+    buylist.cart = {}
+    buylist.index = {}
     VDbuylistLines = {}
     local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
 
@@ -158,7 +159,7 @@ function VDMenu.showMenu( )
         end)
 
     function updateList(item, index)
-        for k,v in pairs(buylist) do
+        for k,v in pairs(buylist.cart) do
             surface.SetFont( "Default" )
             surface.SetTextColor( 255, 255, 255 )
             surface.SetTextPos( 128, 128 ) 
@@ -188,7 +189,13 @@ function VDMenu.showMenu( )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
 
-       
+       -----------------------MAKE THIS A SHOPPING CART PNG WITH A RED COUNTER---------------------------------------
+        VDMenu.test = vgui.Create( "DButton", VDMenu.Frame )
+        VDMenu.test:SetText( "ahhhhh" )
+        VDMenu.test:SetPos( 500, 0 )
+        VDMenu.test:SetSize( ScrW() / 15, ScrH() / 25 )
+
+        ----------------this needs to be in a separate checkout screen-------------------------------------------------
         ---text = "Buy for $"..VDInventory.Prices[i].."?"
         VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
         VDMenu.BuyButton:SetText( "ur mom" )
@@ -197,17 +204,27 @@ function VDMenu.showMenu( )
 
         VDMenu.BuyButton.DoClick = function()
             net.Start("vectordealer_BuyWeapon")
-            net.WriteInt(clickedItem, 1) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
+            net.WriteTable(buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
+        end
+
+         ---text = "Buy for $"..VDInventory.Prices[i].."?"
+        VDMenu.ShoppingCart = vgui.Create( "DButton", VDMenu.Frame )
+        VDMenu.ShoppingCart:SetText( "Add to Cart" )
+        VDMenu.ShoppingCart:SetPos( 100,100 )
+        VDMenu.ShoppingCart:SetSize( ScrW() / 5, ScrH() / 25 )
+
+        VDMenu.ShoppingCart.DoClick = function()
+            table.insert(buylist.cart, VDInventory.Items[i])
+            updateList(VDInventory.Items[i], i)
+            VDMenu.test:SetText(#buylist.cart)
+            table.insert(buylist.index, i)
         end
 
         --clicking on the item itself sets the next to whatever the curr clicked item
         icon.DoClick = function()
-            LNBuyText = "Buy for $"..VDInventory.Prices[i].."?"
-            VDMenu.BuyButton:SetText(""..VDInventory.Items[i])
+            VDMenu.ShoppingCart:SetText("Add "..VDInventory.Items[i].. " To Shopping Cart?")
             --indexes to current shoppingcart
-            table.insert(buylist, VDInventory.Items[i])
-            updateList(VDInventory.Items[i], i)
         end
 
     end
@@ -267,3 +284,12 @@ function ENT:Draw()
  
 end
 
+
+
+function indexof(values,item)
+    local index = {}
+    for k,v in pairs(values) do
+        index[v] = k
+    end
+    return index[item]
+end

@@ -234,6 +234,19 @@ local function VDSetCoins( player, command, money)
 end
 concommand.Add( "VDSetCoins", VDSetCoins, nil, "", {FCVAR_DONTRECORD} )
 
+--[[---------------------------------------------------------
+   Name:	VDViewCoins
+   Desc:	Allows admins to see coins 
+-----------------------------------------------------------]]  
+local function VDViewCoins( player, command, money)
+	if( !player:IsAdmin()) then return end
+	
+	res = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..player:SteamID().."';")
+	print(res)
+end
+concommand.Add( "VDViewCoins", VDViewCoins, nil, "", {FCVAR_DONTRECORD} )
+
+
 
 
 --[[---------------------------------------------------------
