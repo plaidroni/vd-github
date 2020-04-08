@@ -5,7 +5,7 @@ VDMenu.Listings = {}
 VDMenu.Text = {}
 VDMenu.Frame = {}
 VDInventory = {}
-
+VDInventory.CurModel = ""
 
 VDInventory.Items = {} 
 VDInventory.Models = {} 
@@ -64,6 +64,7 @@ net.Receive("TableSend", function()
     end
     --this is so we can decide how to draw the menu based on the items
     VDInventory.numberOfItems = #VDInventory.Items
+    VDInventory.CurModel = VDInventory.Models[1]
 
 end)
 
@@ -164,10 +165,8 @@ function VDMenu.showMenu( )
             end
         end
     end
-    timer.Simple(5,function()
-            VDMenu.Frame:Close()
-        end)
 
+    
     
 
     for i = 1, VDInventory.numberOfItems do
@@ -218,23 +217,79 @@ function VDMenu.showMenu( )
         VDMenu.ShoppingCart:SetSize( ScrW() / 5, ScrH() / 25 )
 
         VDMenu.ShoppingCart.DoClick = function()
-            print(item)
-            table.insert(buylist.cart, item)
-            updateList(item, i)
+            table.insert(buylist.cart, VDInventory.Items[i])
+            updateList(VDInventory.Items[i], i)
             VDMenu.test:SetText(#buylist.cart)
             table.insert(buylist.index, i)
             UpdateCart(buylist.cart,i, currMoney)
         end
-
+        
         --clicking on the item itself sets the next to whatever the curr clicked item
         icon.DoClick = function()
+            VDInventory.CurModel = VDInventory.Models[i]
             item = VDInventory.Items[i]
             VDMenu.ShoppingCart:SetText("Add "..item.. " To Shopping Cart?")
+            updateModelBuy()
             --indexes to current shoppingcart
         end
 
     end
+    VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
+    local scrw9 = ScrW() / 9
+    local scrh16 = ScrH() / 16
+    VDMenu.PurchaseMenu:SetPos(ScrW() * .1, (ScrH() * .5) - ((scrw9 * 2)/2))
+    VDMenu.PurchaseMenu:SetSize(scrh16 * 2, scrw9 * 2)
+    VDMenu.PurchaseMenu:ShowCloseButton(false)
+    VDMenu.PurchaseMenu:SetDraggable(false)
+    VDMenu.PurchaseMenu:SetTitle("")
+    VDMenu.PurchaseMenu:MakePopup()
+    --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
 
+    function VDMenu.PurchaseMenu:Paint(w,h)
+        surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+        surface.DrawOutlinedRect( 0, 0, w, h )
+        surface.DrawLine()
+    end
+    VDMenu.IconPurchaseMenu = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
+
+    VDMenu.IconPurchaseMenu:SetSize( ScrH()/9, ScrW()/16)
+    VDMenu.IconPurchaseMenu.xv, VDMenu.IconPurchaseMenu.yv = VDMenu.IconPurchaseMenu:GetSize()
+    VDMenu.IconPurchaseMenu:SetPos(0,0)
+    VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurModel ) -- you can only change colors on playermodels
+    function VDMenu.IconPurchaseMenu.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
+    local mn, mx = VDMenu.IconPurchaseMenu.Entity:GetRenderBounds()
+    local size = mx.x * 2
+    size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
+    size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
+    size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
+
+    VDMenu.IconPurchaseMenu:SetFOV( 45 )
+    VDMenu.IconPurchaseMenu:SetCamPos( Vector( size, size, size ) )
+    VDMenu.IconPurchaseMenu:SetLookAt( ( mn + mx ) * 0.5 )
+
+    local exitmenu = vgui.Create("DFrame", VDMenu.Frame)
+    local scrw9 = ScrW() / 9
+    local scrh16 = ScrH() / 16
+    exitmenu:SetPos(ScrW() - (scrw9 * .2), scrh16)
+    exitmenu:SetSize(scrw9, scrh16)
+    exitmenu:ShowCloseButton(false)
+    exitmenu:SetDraggable(false)
+    exitmenu:SetTitle("")
+    exitmenu:MakePopup()
+    function exitmenu:Paint(w, h)
+        surface.SetDrawColor( 255, 255, 255, 255)
+        surface.DrawLine(w * .10,0,w * .10,h)
+        draw.DrawText( "CLOSE", "LividityTEXT", w*.2, h*.1, Color(255,255,255,255), TEXT_ALIGN_LEFT )
+        --surface.DrawLine(w * .11,w*.6,)
+    end
+    exitmenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
+    function exitmenu:OnCursorEntered()
+        VDMenu.Frame:Close()
+    end
+    function exitmenu:Think()
+        exitmenu:MoveToFront()
+        VDMenu.PurchaseMenu:MoveToFront()
+    end
     VDMenu.Frame:MoveToFront() 
 end
 
@@ -355,4 +410,8 @@ function updateList(item, index)
             surface.SetTextPos( 128, 128 ) 
             surface.DrawText( "Hello World" )
         end
+end
+
+function updateModelBuy()
+    VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurModel )
 end
