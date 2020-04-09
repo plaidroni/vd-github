@@ -88,6 +88,11 @@ surface.CreateFont("LividityBuy", {
     weight = 500
 })
 
+surface.CreateFont("VDBuyMenuText", {
+    font = "TargetID",
+    size = ScrW()*.007,
+    weight = 500
+})
 
 
 LNBuyText = "text"
@@ -136,6 +141,7 @@ function VDMenu.showMenu( )
         VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
         function VDSit:LayoutEntity( Entity ) return end
     VDMenu.Frame.Paint = function()
+
         function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
         local eyepos = Vector(0, 0, eyecountdown) + VDSit.Entity:GetBonePosition(VDSit.Entity:LookupBone("ValveBiped.Bip01_Head1"))
@@ -167,7 +173,20 @@ function VDMenu.showMenu( )
     end
 
     
-    
+    local followCursor = vgui.Create( "DPanel", VDMenu.Frame )
+    followCursor:SetSize(ScrW(),ScrH())
+    followCursor:SetVisible(false)
+    local mx, my = 0
+    function followCursor:Think()
+        mx,my = input.GetCursorPos()
+        followCursor:SetDrawOnTop()
+    end
+    function followCursor:Paint(w,h)
+        surface.SetDrawColor(255,255,255,255)
+        surface.DrawLine(mx, my, (mx+50), (my-50))
+        surface.DrawOutlinedRect( 0, 0, w, h )
+    end
+
 
     for i = 1, VDInventory.numberOfItems do
         
@@ -192,10 +211,6 @@ function VDMenu.showMenu( )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
 
        -----------------------MAKE THIS A SHOPPING CART PNG WITH A RED COUNTER---------------------------------------
-        VDMenu.test = vgui.Create( "DButton", VDMenu.Frame )
-        VDMenu.test:SetText( "ahhhhh" )
-        VDMenu.test:SetPos( 500, 0 )
-        VDMenu.test:SetSize( ScrW() / 15, ScrH() / 25 )
 
         ----------------this needs to be in a separate checkout screen-------------------------------------------------
         ---text = "Buy for $"..VDInventory.Prices[i].."?"
@@ -209,7 +224,6 @@ function VDMenu.showMenu( )
             net.WriteTable(buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
         end
-
          ---text = "Buy for $"..VDInventory.Prices[i].."?"
         VDMenu.ShoppingCart = vgui.Create( "DButton", VDMenu.Frame )
         VDMenu.ShoppingCart:SetText( "Add to Cart" )
@@ -219,7 +233,6 @@ function VDMenu.showMenu( )
         VDMenu.ShoppingCart.DoClick = function()
             table.insert(buylist.cart, VDInventory.Items[i])
             updateList(VDInventory.Items[i], i)
-            VDMenu.test:SetText(#buylist.cart)
             table.insert(buylist.index, i)
             UpdateCart(buylist.cart,i, currMoney)
         end
@@ -232,6 +245,10 @@ function VDMenu.showMenu( )
             updateModelBuy()
             --indexes to current shoppingcart
         end
+        function icon:IsHovered()
+            print("dsjn")
+            followCursor:SetVisible(true)
+        end
 
     end
     VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
@@ -243,14 +260,26 @@ function VDMenu.showMenu( )
     VDMenu.PurchaseMenu:SetDraggable(false)
     VDMenu.PurchaseMenu:SetTitle("")
     VDMenu.PurchaseMenu:MakePopup()
+    local pmx, pmy = VDMenu.PurchaseMenu:GetSize()
     --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
-
     function VDMenu.PurchaseMenu:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+
         surface.DrawOutlinedRect( 0, 0, w, h )
-        surface.DrawLine()
+        surface.DrawLine((pmx * .13), (pmy * .30), (pmx * .87), (pmy * .30))
+        draw.DrawText(VDInventory.CurModel, "VDBuyMenuText", pmx*.5,pmy*.33, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
-    VDMenu.IconPurchaseMenu = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
+
+    VDMenu.ButtonPurchaseMenu = vgui.Create("DButton", VDMenu.PurchaseMenu)
+    VDMenu.ButtonPurchaseMenu:SetPos(pmx * .10, pmy * .90)
+    VDMenu.ButtonPurchaseMenu:SetSize(pmx * .80, pmy * .05)
+    VDMenu.ButtonPurchaseMenu:SetText("")
+    function VDMenu.ButtonPurchaseMenu:Paint(w,h)
+        surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+        surface.DrawOutlinedRect(0,0,w,h)
+        draw.DrawText("BUY", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ButtonPurchaseMenu:GetTall() *.25, Color(255,255,255,255), TEXT_ALIGN_CENTER)
+    end
+    --[[VDMenu.IconPurchaseMenu = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
 
     VDMenu.IconPurchaseMenu:SetSize( ScrH()/9, ScrW()/16)
     VDMenu.IconPurchaseMenu.xv, VDMenu.IconPurchaseMenu.yv = VDMenu.IconPurchaseMenu:GetSize()
@@ -265,7 +294,7 @@ function VDMenu.showMenu( )
 
     VDMenu.IconPurchaseMenu:SetFOV( 45 )
     VDMenu.IconPurchaseMenu:SetCamPos( Vector( size, size, size ) )
-    VDMenu.IconPurchaseMenu:SetLookAt( ( mn + mx ) * 0.5 )
+    VDMenu.IconPurchaseMenu:SetLookAt( ( mn + mx ) * 0.5 )]]--
 
     local exitmenu = vgui.Create("DFrame", VDMenu.Frame)
     local scrw9 = ScrW() / 9
