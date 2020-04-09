@@ -101,6 +101,8 @@ local modelSet = false
 local clickedItem = 0
 local currMoney = 0
 local item = 0
+local scrw9 = ScrW() / 9
+local scrh16 = ScrH() / 16
 
 --initialization of the menu itself
 
@@ -111,9 +113,6 @@ function VDMenu.showMenu( )
     net.Receive("MoneySend",function(ply,money)
         currMoney = Money
     end)
-
-
-
 
     x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
@@ -175,18 +174,52 @@ function VDMenu.showMenu( )
     
     local followCursor = vgui.Create( "DPanel", VDMenu.Frame )
     followCursor:SetSize(ScrW(),ScrH())
-    followCursor:SetVisible(false)
     local mx, my = 0
+    followCursor:SetVisible(false)
+
     function followCursor:Think()
         mx,my = input.GetCursorPos()
         followCursor:SetDrawOnTop()
+        
     end
     function followCursor:Paint(w,h)
+        local panel = vgui.GetHoveredPanel()
+        draw.DrawText(panel:GetModel(), "VDBuyMenuText", mx+55,my-65, Color(255,255,255,255), TEXT_ALIGN_LEFT)
         surface.SetDrawColor(255,255,255,255)
         surface.DrawLine(mx, my, (mx+50), (my-50))
+        
+    end
+    VDMenu.ShoppingCartFrame = vgui.Create("DFrame", VDMenu.Frame)
+    VDMenu.ShoppingCartFrame:SetPos(ScrW() * .8, (ScrH() * .5) - ((scrw9 * 2)/2))
+    VDMenu.ShoppingCartFrame:SetSize(scrh16 * 2, scrw9 * 2)
+    VDMenu.ShoppingCartFrame:ShowCloseButton(false)
+    VDMenu.ShoppingCartFrame:SetDraggable(false)
+    VDMenu.ShoppingCartFrame:SetTitle("")
+    VDMenu.ShoppingCartFrame:MakePopup()
+    local pmx, pmy = VDMenu.ShoppingCartFrame:GetSize()
+    --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
+    function VDMenu.ShoppingCartFrame:Paint(w,h)
+        surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         surface.DrawOutlinedRect( 0, 0, w, h )
     end
-
+    VDMenu.ShoppingCartScroll = vgui.Create("DScrollPanel", VDMenu.ShoppingCartFrame)
+    VDMenu.ShoppingCartScroll:SetPos(0,0)
+    VDMenu.ShoppingCartScroll:SetSize(scrh16 * 2, scrw9 * 1.8)
+    --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
+    function VDMenu.ShoppingCartScroll:Paint(w,h)
+        surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+        surface.DrawOutlinedRect( 0, 0, w, h )
+    end
+    VDMenu.ShoppingCartButton = vgui.Create("DButton", VDMenu.ShoppingCartFrame)
+    VDMenu.ShoppingCartButton:SetPos(pmx * .10, pmy * .90)
+    VDMenu.ShoppingCartButton:SetSize(pmx * .80, pmy * .05)
+    VDMenu.ShoppingCartButton:SetText("")
+    function VDMenu.ShoppingCartButton:Paint(w,h)
+        surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
+        surface.DrawOutlinedRect(0,0,w,h)
+        draw.DrawText("BUY FOR ".."", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ButtonPurchaseMenu:GetTall() /4, Color(255,255,255,255), TEXT_ALIGN_CENTER)
+    end
+    
 
     for i = 1, VDInventory.numberOfItems do
         
@@ -194,7 +227,7 @@ function VDMenu.showMenu( )
         local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
 
         local icon = vgui.Create( "DModelPanel", VDMenu.Frame )
-
+        icon:SetMouseInputEnabled( true )
         icon:SetSize( ScrH()/9, ScrW()/16)
         xz,yz = icon:GetSize()
         icon:SetPos(x - xz/4, y - yz/2.25)
@@ -225,12 +258,8 @@ function VDMenu.showMenu( )
             net.SendToServer()
         end
          ---text = "Buy for $"..VDInventory.Prices[i].."?"
-        VDMenu.ShoppingCart = vgui.Create( "DButton", VDMenu.Frame )
-        VDMenu.ShoppingCart:SetText( "Add to Cart" )
-        VDMenu.ShoppingCart:SetPos( 100,100 )
-        VDMenu.ShoppingCart:SetSize( ScrW() / 5, ScrH() / 25 )
 
-        VDMenu.ShoppingCart.DoClick = function()
+        VDMenu.ShoppingCartButton.DoClick = function()
             table.insert(buylist.cart, VDInventory.Items[i])
             updateList(VDInventory.Items[i], i)
             table.insert(buylist.index, i)
@@ -245,15 +274,15 @@ function VDMenu.showMenu( )
             updateModelBuy()
             --indexes to current shoppingcart
         end
-        function icon:IsHovered()
-            print("dsjn")
+        function icon:OnCursorEntered()
             followCursor:SetVisible(true)
+        end
+        function icon:OnCursorExited()
+            followCursor:SetVisible(false)
         end
 
     end
     VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
-    local scrw9 = ScrW() / 9
-    local scrh16 = ScrH() / 16
     VDMenu.PurchaseMenu:SetPos(ScrW() * .1, (ScrH() * .5) - ((scrw9 * 2)/2))
     VDMenu.PurchaseMenu:SetSize(scrh16 * 2, scrw9 * 2)
     VDMenu.PurchaseMenu:ShowCloseButton(false)
@@ -264,7 +293,6 @@ function VDMenu.showMenu( )
     --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
     function VDMenu.PurchaseMenu:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
-
         surface.DrawOutlinedRect( 0, 0, w, h )
         surface.DrawLine((pmx * .13), (pmy * .30), (pmx * .87), (pmy * .30))
         draw.DrawText(VDInventory.CurModel, "VDBuyMenuText", pmx*.5,pmy*.33, Color(255,255,255,255), TEXT_ALIGN_CENTER)
@@ -277,7 +305,7 @@ function VDMenu.showMenu( )
     function VDMenu.ButtonPurchaseMenu:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         surface.DrawOutlinedRect(0,0,w,h)
-        draw.DrawText("BUY", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ButtonPurchaseMenu:GetTall() *.25, Color(255,255,255,255), TEXT_ALIGN_CENTER)
+        draw.DrawText("ADD", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ButtonPurchaseMenu:GetTall() /4, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
     --[[VDMenu.IconPurchaseMenu = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
 
@@ -296,28 +324,27 @@ function VDMenu.showMenu( )
     VDMenu.IconPurchaseMenu:SetCamPos( Vector( size, size, size ) )
     VDMenu.IconPurchaseMenu:SetLookAt( ( mn + mx ) * 0.5 )]]--
 
-    local exitmenu = vgui.Create("DFrame", VDMenu.Frame)
-    local scrw9 = ScrW() / 9
-    local scrh16 = ScrH() / 16
-    exitmenu:SetPos(ScrW() - (scrw9 * .2), scrh16)
-    exitmenu:SetSize(scrw9, scrh16)
-    exitmenu:ShowCloseButton(false)
-    exitmenu:SetDraggable(false)
-    exitmenu:SetTitle("")
-    exitmenu:MakePopup()
-    function exitmenu:Paint(w, h)
+    VDMenu.ExitButton = vgui.Create("DFrame", VDMenu.Frame)
+    VDMenu.ExitButton:SetPos(ScrW() - (scrw9 * .2), scrh16)
+    VDMenu.ExitButton:SetSize(scrw9, scrh16)
+    VDMenu.ExitButton:ShowCloseButton(false)
+    VDMenu.ExitButton:SetDraggable(false)
+    VDMenu.ExitButton:SetTitle("")
+    VDMenu.ExitButton:MakePopup()
+    function VDMenu.ExitButton:Paint(w, h)
         surface.SetDrawColor( 255, 255, 255, 255)
         surface.DrawLine(w * .10,0,w * .10,h)
         draw.DrawText( "CLOSE", "LividityTEXT", w*.2, h*.1, Color(255,255,255,255), TEXT_ALIGN_LEFT )
         --surface.DrawLine(w * .11,w*.6,)
     end
-    exitmenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
-    function exitmenu:OnCursorEntered()
+    VDMenu.ExitButton:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
+    function VDMenu.ExitButton:OnCursorEntered()
         VDMenu.Frame:Close()
     end
-    function exitmenu:Think()
-        exitmenu:MoveToFront()
+    function VDMenu.ExitButton:Think()
+        VDMenu.ExitButton:MoveToFront()
         VDMenu.PurchaseMenu:MoveToFront()
+        VDMenu.ShoppingCartFrame:MoveToFront()
     end
     VDMenu.Frame:MoveToFront() 
 end
@@ -459,6 +486,7 @@ function updateModelBuy()
     VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurModel )
 end
 
+
 function updateCartInPanel(money, subtotal)
 
     print(map(buylist.cart,function(item) return item end))
@@ -481,3 +509,18 @@ end
 t = { pig = "pig", cow = "big cow", sheep = "white sheep" }
 local newt = map(t, function(item) return string.upper(item) end)
 
+
+function setContains(set, key)
+    return set[key] ~= nil
+end
+
+function updateShoppingCart(money, subtotal)
+    local extras = {}
+    for k,v in pairs(buylist.cart) do
+        if setContains(buylist.cart, v)
+            extras.insert(v)
+        else
+            
+        end
+    end
+end
