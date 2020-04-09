@@ -401,8 +401,10 @@ end)
 
 
 function UpdateCart(tbl,index, money)
+
     PrintTable(tbl)
     subtotal = Subtotal(tbl)
+    updateCartInPanel(money,subtotal)
     print("Balance: $"..""..money)
     print("Subtotal: $"..subtotal)
     print("New Balance: $"..money-subtotal)
@@ -441,6 +443,41 @@ function updateList(item, index)
         end
 end
 
+
+function updateCartInPanel(money, subtotal)
+
+    PrintTable(map(buylist.cart,function(item) return item end))
+
+
+end
+
+
+
+
+
 function updateModelBuy()
     VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurModel )
 end
+
+function updateCartInPanel(money, subtotal)
+
+    print(map(buylist.cart,function(item) return item end))
+
+
+end
+
+
+
+function map(tbl, f)
+    local t = {}
+    for k,v in pairs(tbl) do
+        print("yes")
+        print(f(v))
+        t[k] = f(v)
+    end
+    return t
+end
+
+t = { pig = "pig", cow = "big cow", sheep = "white sheep" }
+local newt = map(t, function(item) return string.upper(item) end)
+
