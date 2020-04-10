@@ -1,74 +1,5 @@
 include("shared.lua")
 
-VDMenu = {}
-VDMenu.Listings = {}
-VDMenu.Text = {}
-VDMenu.Frame = {}
-VDInventory = {}
-VDInventory.CurModel = ""
-
-VDInventory.Items = {} 
-VDInventory.Models = {} 
-VDInventory.Prices = {} 
-VDInventory.numberOfItems = #VDInventory.Items
---lol
-net.Receive("TableSend", function()
-
-    --resets last inventory cycle
-    VDInventory.Items = {} 
-    VDInventory.Models = {} 
-    VDInventory.Prices = {}
-    --grabs the inventory
-    guns=net.ReadTable()
-    num = #guns
-    
-    --for separating models,item,price
-    x=1
-    --loop through matrix
-    for i=1, num do
-        --loop through individual guns so we can split that bitch
-        for k,v in pairs(guns[i]) do
-               --[[
-                format is this lol
-                guns = {
-                1 = {String model1, String item1, Int price1},
-                2 = {String model2, String item2, Int price2},
-                3 = {String model3, String item3, Int price3},
-                4 = {String model4, String item4, Int price4},
-                5 = {String model5, String item5, Int price5},
-                6 = {String model6, String item6, Int price6}
-                }
-                so when we are looping below we can do it like this
-                gun[1] == {String model1, String item1, Int price1} --> gun[1][1] == String model1
-                this is so we can store the same index for the same gun but in differing tables
-                so index 1 is always gun 1 for all tables
-               ]]
-
-
-            if x == 1 then
-                table.insert(VDInventory.Models, v)
-                x = x + 1
-                   
-            elseif x == 2 then
-                table.insert(VDInventory.Items, v)
-                x = x + 1   
-
-            elseif x == 3 then
-                        
-                table.insert(VDInventory.Prices,  v)
-                x = 1
-
-            else return 
-            end
-        end
-    end
-    --this is so we can decide how to draw the menu based on the items
-    VDInventory.numberOfItems = #VDInventory.Items
-    VDInventory.CurModel = VDInventory.Models[1]
-
-end)
-
-
 
 surface.CreateFont("LividityTEXT", {
     font = "Roboto",
@@ -95,6 +26,20 @@ surface.CreateFont("VDBuyMenuText", {
 })
 
 
+--------------------------------VARIABLES--------------------------------
+VDMenu = {}
+VDMenu.Listings = {}
+VDMenu.Text = {}
+VDMenu.Frame = {}
+VDInventory = {}
+VDInventory.CurName = ""
+
+VDInventory.Items = {} 
+VDInventory.Models = {} 
+VDInventory.Prices = {} 
+VDInventory.numberOfItems = #VDInventory.Items
+
+
 LNBuyText = "text"
 local menuOpen = false
 local modelSet = false
@@ -103,6 +48,15 @@ local currMoney = 0
 local item = 0
 local scrw9 = ScrW() / 9
 local scrh16 = ScrH() / 16
+local iconIndex = nil
+
+--------------------------------VARIABLES--------------------------------
+
+
+
+
+
+
 
 --initialization of the menu itself
 
@@ -131,7 +85,10 @@ function VDMenu.showMenu( )
     buylist = {}
     buylist.cart = {}
     buylist.index = {}
-    VDbuylistLines = {}
+
+
+
+    ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
     local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
 
         VDSit:SetSize( ScrH()/6, ScrW()/10.666)
@@ -148,6 +105,14 @@ function VDMenu.showMenu( )
         VDSit:SetCamPos(eyepos-Vector(-20, 0, 0)) -- Move cam in front of eyes
         VDSit.Entity:SetEyeTarget(eyepos-Vector(-12, 0, 0))
         VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
+
+    ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
+
+
+
+
+
+ ----------------------------------CREATING INVENTORY-------------------------------------------------   
    
     --grabs the number of items from the soon to be sql table
         surface.SetDrawColor( 50, 50, 50, 150 )
@@ -170,7 +135,11 @@ function VDMenu.showMenu( )
             end
         end
     end
+----------------------------------CREATING INVENTORY-------------------------------------------------
 
+
+
+---------------------------------FOLLOW CURSOR-------------------------------------------------
     
     local followCursor = vgui.Create( "DPanel", VDMenu.Frame )
     followCursor:SetSize(ScrW(),ScrH())
@@ -184,11 +153,21 @@ function VDMenu.showMenu( )
     end
     function followCursor:Paint(w,h)
         local panel = vgui.GetHoveredPanel()
-        draw.DrawText(panel:GetModel(), "VDBuyMenuText", mx+55,my-65, Color(255,255,255,255), TEXT_ALIGN_LEFT)
+        model = panel:GetModel()
+        index = indexof(VDInventory.Models,model)
+        draw.DrawText(VDInventory.Names[index], "VDBuyMenuText", mx+55,my-65, Color(255,255,255,255), TEXT_ALIGN_LEFT)
         surface.SetDrawColor(255,255,255,255)
         surface.DrawLine(mx, my, (mx+50), (my-50))
         
     end
+---------------------------------FOLLOW CURSOR-------------------------------------------------
+
+
+
+
+
+--------------------------------FRAME FOR SHOPPING CART------------------------------------------
+
     VDMenu.ShoppingCartFrame = vgui.Create("DFrame", VDMenu.Frame)
     VDMenu.ShoppingCartFrame:SetPos(ScrW() * .8, (ScrH() * .5) - ((scrw9 * 2)/2))
     VDMenu.ShoppingCartFrame:SetSize(scrh16 * 2, scrw9 * 2)
@@ -219,9 +198,18 @@ function VDMenu.showMenu( )
         surface.DrawOutlinedRect(0,0,w,h)
         draw.DrawText("BUY FOR ".."", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ButtonPurchaseMenu:GetTall() /4, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
-    
+
+--------------------------------FRAME FOR SHOPPING CART------------------------------------------
+
+
+
+
+
+
+    ----------------------DRAWING ITEMS---------------------------------------
 
     for i = 1, VDInventory.numberOfItems do
+
         
         local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 50
         local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
@@ -243,7 +231,14 @@ function VDMenu.showMenu( )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
 
-       -----------------------MAKE THIS A SHOPPING CART PNG WITH A RED COUNTER---------------------------------------
+  ----------------------DRAWING ITEMS---------------------------------------
+
+
+
+
+
+
+-------------------------------------CHECKOUT-----------------------------------
 
         ----------------this needs to be in a separate checkout screen-------------------------------------------------
         ---text = "Buy for $"..VDInventory.Prices[i].."?"
@@ -253,25 +248,25 @@ function VDMenu.showMenu( )
         VDMenu.BuyButton:SetSize( ScrW() / 15, ScrH() / 25 )
 
         VDMenu.BuyButton.DoClick = function()
+            PrintTable(buylist)
             net.Start("vectordealer_BuyWeapon")
             net.WriteTable(buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
             net.SendToServer()
         end
          ---text = "Buy for $"..VDInventory.Prices[i].."?"
+-------------------------------------CHECKOUT-----------------------------------
+       
 
-        VDMenu.ShoppingCartButton.DoClick = function()
-            table.insert(buylist.cart, VDInventory.Items[i])
-            updateList(VDInventory.Items[i], i)
-            table.insert(buylist.index, i)
-            UpdateCart(buylist.cart,i, currMoney)
-        end
-        
+
+-----------------------------------ICON------------------------------------------
         --clicking on the item itself sets the next to whatever the curr clicked item
         icon.DoClick = function()
-            VDInventory.CurModel = VDInventory.Models[i]
+            VDInventory.CurName = VDInventory.Names[i]
             item = VDInventory.Items[i]
-            VDMenu.ShoppingCart:SetText("Add "..item.. " To Shopping Cart?")
-            updateModelBuy()
+            iconIndex = i
+            
+            --VDMenu.ShoppingCart:SetText("Add "..item.. " To Shopping Cart?")
+           -- updateModelBuy()
             --indexes to current shoppingcart
         end
         function icon:OnCursorEntered()
@@ -281,7 +276,13 @@ function VDMenu.showMenu( )
             followCursor:SetVisible(false)
         end
 
-    end
+    
+-----------------------------------ICON------------------------------------------
+
+
+
+
+    -------------------------------PURCHASE MENU-------------------------------------------------------
     VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     VDMenu.PurchaseMenu:SetPos(ScrW() * .1, (ScrH() * .5) - ((scrw9 * 2)/2))
     VDMenu.PurchaseMenu:SetSize(scrh16 * 2, scrw9 * 2)
@@ -295,9 +296,17 @@ function VDMenu.showMenu( )
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         surface.DrawOutlinedRect( 0, 0, w, h )
         surface.DrawLine((pmx * .13), (pmy * .30), (pmx * .87), (pmy * .30))
-        draw.DrawText(VDInventory.CurModel, "VDBuyMenuText", pmx*.5,pmy*.33, Color(255,255,255,255), TEXT_ALIGN_CENTER)
+        draw.DrawText(VDInventory.CurName, "VDBuyMenuText", pmx*.5,pmy*.33, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
 
+-------------------------------PURCHASE MENU-------------------------------------------------------
+
+
+
+
+
+   
+-------------------------------ADD TO CART--------------------------------------------------------
     VDMenu.ButtonPurchaseMenu = vgui.Create("DButton", VDMenu.PurchaseMenu)
     VDMenu.ButtonPurchaseMenu:SetPos(pmx * .10, pmy * .90)
     VDMenu.ButtonPurchaseMenu:SetSize(pmx * .80, pmy * .05)
@@ -307,23 +316,25 @@ function VDMenu.showMenu( )
         surface.DrawOutlinedRect(0,0,w,h)
         draw.DrawText("ADD", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ButtonPurchaseMenu:GetTall() /4, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
-    --[[VDMenu.IconPurchaseMenu = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
 
-    VDMenu.IconPurchaseMenu:SetSize( ScrH()/9, ScrW()/16)
-    VDMenu.IconPurchaseMenu.xv, VDMenu.IconPurchaseMenu.yv = VDMenu.IconPurchaseMenu:GetSize()
-    VDMenu.IconPurchaseMenu:SetPos(0,0)
-    VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurModel ) -- you can only change colors on playermodels
-    function VDMenu.IconPurchaseMenu.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
-    local mn, mx = VDMenu.IconPurchaseMenu.Entity:GetRenderBounds()
-    local size = mx.x * 2
-    size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
-    size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
-    size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
 
-    VDMenu.IconPurchaseMenu:SetFOV( 45 )
-    VDMenu.IconPurchaseMenu:SetCamPos( Vector( size, size, size ) )
-    VDMenu.IconPurchaseMenu:SetLookAt( ( mn + mx ) * 0.5 )]]--
+    VDMenu.ButtonPurchaseMenu.DoClick = function()
+        
+        table.insert(buylist.cart, VDInventory.Items[iconIndex])
+      
+     -- updateList(VDInventory.Items[i], i)
+        table.insert(buylist.index, iconIndex)
+        UpdateCart(buylist.cart,iconIndex, currMoney)
 
+    end
+    end
+-------------------------------ADD TO CART--------------------------------------------------------
+    
+
+
+
+
+------------------------------EXIT BUTTON--------------------------------------------------------
     VDMenu.ExitButton = vgui.Create("DFrame", VDMenu.Frame)
     VDMenu.ExitButton:SetPos(ScrW() - (scrw9 * .2), scrh16)
     VDMenu.ExitButton:SetSize(scrw9, scrh16)
@@ -349,33 +360,117 @@ function VDMenu.showMenu( )
     VDMenu.Frame:MoveToFront() 
 end
 
---Shopping Cart---------------------------------------------------------------------------------------
---[[VDMenu.CartScreen = vgui.Create( "DPanel" , VDMenu.Frame)
-    VDMenu.CartScreen:SetSize(500,200)
-    VDMenu.CartScreen:Dock(RIGHT)
-    VDMenu.CartScreen:SetVisible(true)
-    --VDMenu.CartScreen:ShowCloseButton(false)
-    --VDMenu.CartScreen:SetSizable(false)
-    --VDMenu.CartScreen:SetIcon("")
-    --VDMenu.CartScreen:SetDraggable(false)
-    --VDMenu.CartScreen:SetTitle("Cart")
-    
+------------------------------EXIT BUTTON--------------------------------------------------------
 
-VDMenu.CartScreenLabel = vgui.Create("Dlabel", VDMenu.CartScreen)
-    --VDMenu.CartScreenLabel:SetPos(10,10)
-    --VDMenu.CartScreenLabel:SetText("Yellow")
+
+
+----------------------------------UPDATING THE CART--------------------------------------
+--Prints the Updated Cart When an item is added
+
+function UpdateCart(tbl,index, money)
     
+    --PrintTable(tbl)
    
+    subtotal = Subtotal(tbl)
+   
+    hashmap = updateCartInPanel(VDInventory.Items[index])
 
-]]
+    --print(hashmap[VDInventory.Items[index]])
+
+   -- print("Balance: $"..""..money)
+   -- print("Subtotal: $"..subtotal)
+   -- print("New Balance: $"..money-subtotal)
+   -- print("")
+   -- print("")
+end
+
+--calculates the subtotal of the current shopping cart
+
+function Subtotal()
+    subtotal = 0
+    for k,v in pairs(buylist.cart) do
+        index = indexof(VDInventory.Items,v)
+       
+      
+        price = VDInventory.Prices[index]
+
+        subtotal = subtotal + price
+    end
+    return subtotal
+end
+
+
+--returns the index of the inputted value
+function indexof(values,item)
+    local index = {}
+    for k,v in pairs(values) do
+        index[v] = k
+    end
+    return index[item]
+end
+
+----------------------------------UPDATING THE CART--------------------------------------
 
 
 
 
 
+---------------------------------MAPPING FOR QUANTITY---------------------------
 
 
--------------------------Blur--------------------------
+
+--Attempts to make a map
+local dictionary = {}
+function updateCartInPanel(item)
+    --this checks if the item is in the dictionary
+   if setContains(dictionary, item) then
+        --if it does it indexes the quantity by 1
+       dictionary[item] = dictionary[item] + 1
+    else
+
+        --if not it adds to the dictionary and puts the quantity to 1
+       
+
+        table.insert(dictionary,item)
+
+        dictionary[item] = 1
+    end
+    return dictionary
+end
+
+
+function setContains(set, key)
+    return set[key] ~= nil
+end
+
+---------------------------------MAPPING FOR QUANTITY---------------------------
+
+
+
+----------------------------UPDATING MODEL------------------------------
+--[[
+function updateModelBuy()
+    --VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurName )
+end
+
+--??????
+function updateList(item, index)
+        for k,v in pairs(buylist.cart) do
+            surface.SetFont( "Default" )
+            surface.SetTextColor( 255, 255, 255 )
+            surface.SetTextPos( 128, 128 ) 
+            surface.DrawText( "Hello World" )
+        end
+end
+--]]
+
+----------------------------UPDATING MODEL------------------------------
+
+
+
+
+
+-------------------------BLUR--------------------------
     -- Panel based blur function by Chessnut from NutScript
     --make that bitch pretty (づ｡◕‿‿◕｡)づ
 local blur = Material( "pp/blurscreen" )
@@ -393,134 +488,111 @@ function VDMenu.blur( panel, layers, density, alpha )
         surface.DrawTexturedRect( -x, -y, ScrW(), ScrH() )
     end
 end
+-------------------------BLUR--------------------------
 
 
 
+---------INITIALIZATION------------------------------
 
-
---[[open the menu
-function VDMenu.KeyPress( ply , bind, pressed)
-    if (bind == "gm_showspare2" && (not menuOpen)) then
-        VDMenu.showMenu( )
-    end
-end
-
-hook.Add("PlayerBindPress", "VDMenu.KeyPress", VDMenu.KeyPress)
-
-
-   
-net.Receive("vectordealer_AlertPlayers", function()
-   
-end)]]
-   
 function ENT:Draw()
---made by me tobias too mother fucker some of this dogshit code is mine ):<
---MADE BY plaidroni (http://steamcommunity.com/id/plaidroni/)
+
     self:DrawModel()
     
-    --------------------------------
- 
 end
 
+--opens the menu when pressed on
 net.Receive("vectordealer_UsePanel", function( len )
     VDMenu.showMenu()
 end)
 
-
-function UpdateCart(tbl,index, money)
-
-    PrintTable(tbl)
-    subtotal = Subtotal(tbl)
-    updateCartInPanel(money,subtotal)
-    print("Balance: $"..""..money)
-    print("Subtotal: $"..subtotal)
-    print("New Balance: $"..money-subtotal)
-    print("")
-    print("")
-end
-
-function Subtotal()
-    subtotal = 0
-    for k,v in pairs(buylist.cart) do
-        index = indexof(VDInventory.Items,v)
-       
-      
-        price = VDInventory.Prices[index]
-
-        subtotal = subtotal + price
-    end
-    return subtotal
-end
-
-
-function indexof(values,item)
-    local index = {}
-    for k,v in pairs(values) do
-        index[v] = k
-    end
-    return index[item]
-end
-
-function updateList(item, index)
-        for k,v in pairs(buylist.cart) do
-            surface.SetFont( "Default" )
-            surface.SetTextColor( 255, 255, 255 )
-            surface.SetTextPos( 128, 128 ) 
-            surface.DrawText( "Hello World" )
-        end
-end
-
-
-function updateCartInPanel(money, subtotal)
-
-    PrintTable(map(buylist.cart,function(item) return item end))
-
-
-end
+---------INITIALIZATION------------------------------
 
 
 
 
+------------------------------------GRABBING INVENTORY------------------------------------------
+--lol
+net.Receive("TableSend", function()
 
-function updateModelBuy()
-    VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurModel )
-end
+    --resets last inventory cycle
+    VDInventory.Names = {}
+    VDInventory.Models = {} 
+    VDInventory.Items = {}
+    VDInventory.Prices = {}
+    
+    --grabs the inventory
+    guns=net.ReadTable()
+    num = #guns
 
+    --for separating models,item,price
+    x=1
+    --loop through matrix
+    for i=1, num do
+        --loop through individual guns so we can split that bitch
+        for k,v in pairs(guns[i]) do
+                
+               --[[
+                format is this lol
+                guns = {
+                1 = {String model1, String item1, Int price1},
+                2 = {String model2, String item2, Int price2},
+                3 = {String model3, String item3, Int price3},
+                4 = {String model4, String item4, Int price4},
+                5 = {String model5, String item5, Int price5},
+                6 = {String model6, String item6, Int price6}
+                }
+                so when we are looping below we can do it like this
+                gun[1] == {String model1, String item1, Int price1} --> gun[1][1] == String model1
+                this is so we can store the same index for the same gun but in differing tables
+                so index 1 is always gun 1 for all tables
+               ]]
 
-function updateCartInPanel(money, subtotal)
+            if x == 1 then
+                table.insert(VDInventory.Items, v)
+                x = x + 1
+            elseif x == 2 then
+                table.insert(VDInventory.Models, v)
+                x = x + 1
+                   
+            elseif x == 3 then
+                table.insert(VDInventory.Names, v)
+                x = x + 1   
 
-    print(map(buylist.cart,function(item) return item end))
+            elseif x == 4 then
+                        
+                table.insert(VDInventory.Prices,  v)
+                x = 1
 
-
-end
-
-
-
-function map(tbl, f)
-    local t = {}
-    for k,v in pairs(tbl) do
-        print("yes")
-        print(f(v))
-        t[k] = f(v)
-    end
-    return t
-end
-
-t = { pig = "pig", cow = "big cow", sheep = "white sheep" }
-local newt = map(t, function(item) return string.upper(item) end)
-
-
-function setContains(set, key)
-    return set[key] ~= nil
-end
-
-function updateShoppingCart(money, subtotal)
-    local extras = {}
-    for k,v in pairs(buylist.cart) do
-        if setContains(buylist.cart, v)
-            extras.insert(v)
-        else
-            
+            else return 
+            end
         end
     end
-end
+    --this is so we can decide how to draw the menu based on the items
+    VDInventory.numberOfItems = #VDInventory.Items
+    VDInventory.CurName = VDInventory.Names[1]
+
+    
+
+end)
+
+------------------------------------GRABBING INVENTORY------------------------------------------
+
+
+
+
+    --[[VDMenu.IconPurchaseMenu = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
+
+    VDMenu.IconPurchaseMenu:SetSize( ScrH()/9, ScrW()/16)
+    VDMenu.IconPurchaseMenu.xv, VDMenu.IconPurchaseMenu.yv = VDMenu.IconPurchaseMenu:GetSize()
+    VDMenu.IconPurchaseMenu:SetPos(0,0)
+    VDMenu.IconPurchaseMenu:SetModel( VDInventory.CurName ) -- you can only change colors on playermodels
+    function VDMenu.IconPurchaseMenu.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
+    local mn, mx = VDMenu.IconPurchaseMenu.Entity:GetRenderBounds()
+    local size = mx.x * 2
+    size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
+    size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
+    size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
+
+    VDMenu.IconPurchaseMenu:SetFOV( 45 )
+    VDMenu.IconPurchaseMenu:SetCamPos( Vector( size, size, size ) )
+    VDMenu.IconPurchaseMenu:SetLookAt( ( mn + mx ) * 0.5 )]]--

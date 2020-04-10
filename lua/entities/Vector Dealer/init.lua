@@ -267,26 +267,33 @@ end
 --updates tables ^^^^^^^^^^^^^^^^^^^^^^
 --this shit is explained in cl_init.lua its a copy paste lol
 function appendToInv(guns)
-    VDInventory.Items = {} 
+    VDInventory.Names = {}
     VDInventory.Models = {} 
+    VDInventory.Items = {}
     VDInventory.Prices = {}
     num = #guns
     x=1
     for i=1, num do
         for k,v in pairs(guns[i]) do
-                
+         
             if x == 1 then
+                
+                table.insert(VDInventory.Prices,  tonumber(v))
+                
+
+                x = x + 1    
+            elseif x == 2 then
                 table.insert(VDInventory.Models, v)
 
                 x = x + 1
                    
-            elseif x == 2 then
-                table.insert(VDInventory.Items, v)
+            elseif x == 3 then
+                table.insert(VDInventory.Names, v)
                 x = x + 1   
 
-            elseif x == 3 then
+            elseif x == 4 then
                         
-                table.insert(VDInventory.Prices,  tonumber(v))
+                table.insert(VDInventory.Items, v)
                 x = 1
 
             else return 
@@ -294,6 +301,8 @@ function appendToInv(guns)
         end
     end
     VDInventory.numberOfItems = #VDInventory.Items
+
+    
 end
 
 
