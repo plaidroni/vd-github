@@ -166,7 +166,7 @@ concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
 -----------------------------------------------------------]]  
 local function VDAddWep(player, command, wep)
 	if( !player:IsAdmin()) then return end
-	query = sql.Query("INSERT INTO VDInventory(model,gun,cost) VALUES('"..model[1].."', '"..model[2].."', '"..model[3].."');")
+	query = sql.Query("INSERT INTO VDInventory(name,model,gun,cost) VALUES('"..model[1].."', '"..model[2].."', '"..model[3].."','"..model[4].."'');")
 	if not query then print(sql.LastError())
 	else print("Success!")
 	end		
