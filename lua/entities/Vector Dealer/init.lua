@@ -265,10 +265,10 @@ end
 --updates tables ^^^^^^^^^^^^^^^^^^^^^^
 --this shit is explained in cl_init.lua its a copy paste lol
 function appendToInv(guns)
-    local VDInventory.Names = {}
-    local VDInventory.Models = {} 
-    local VDInventory.Items = {}
-    local VDInventory.Prices = {}
+    VDInventory.Names = {}
+    VDInventory.Models = {} 
+    VDInventory.Items = {}
+    VDInventory.Prices = {}
 
    
 
@@ -301,7 +301,7 @@ function appendToInv(guns)
             end
         end
     end
-    local VDInventory.numberOfItems = #VDInventory.Items
+    VDInventory.numberOfItems = #VDInventory.Items
 
     
 end
