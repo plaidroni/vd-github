@@ -87,7 +87,7 @@ function ENT:Think()
     self:SetColor(Color(0,0,0,155))
 end
 net.Receive("vectordealer_TeleportCasino", function(len, ply)
-    
+    if not ply:IsPlayer() then return end
 
     res=sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
     if(res) then
@@ -109,7 +109,7 @@ end)
  
 function ENT:Use( Name, Caller )
     if Name:IsPlayer() then
-        x,y,z  = Name:GetPos():Unpack()
+        local x,y,z  = Name:GetPos():Unpack()
         
 
         z = z + 60
@@ -143,25 +143,27 @@ end
 
 
 net.Receive("vectordealer_BuyWeapon", function( len, ply)    
-    
-    buylist = net.ReadTable()
+    if not ply:IsPlayer() then return end
+    local buylist = net.ReadTable()
     
     --OKAY SO BASICALLY THIS WHOLE THING IS LIKE REALLY NEAT SO WHAT THIS DOES IS RECIEVES THE SHOPPING CART TABLE AND THEN FINDS THE INDEX OF THE SPECIFIC ITEM IN THE
     --SYSTEM THAT WE HAVE AND THEN CREATES AN ITEM PER ONE AND SUBTRACTS THE MONEY FROM IT AUTOMATICALLY ITS BEAUTIFUL
     for k,v in pairs(buylist.cart) do
         
         --Variables
-        index = indexof(VDInventory.Items,v)
-        price = VDInventory.Prices[index]
-        moneyAmount = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
+        local index = indexof(VDInventory.Items,v)
+        local price = VDInventory.Prices[index]
+        local moneyAmount = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
         moneyAmount = tonumber(moneyAmount)
         
+        if (moneyAmount <= 0 || moneyAmount > 1000000) then return end
+
         --Checks to see if sql works
         if moneyAmount then
             --Checks to see if u have a balance
             if moneyAmount >= price then    
                     --subtracts money
-                    res=sql.Query("UPDATE VDCoin SET Money='"..moneyAmount - price .."' WHERE Name = '"..ply:SteamID().."';")
+                    local res=sql.Query("UPDATE VDCoin SET Money='"..moneyAmount - price .."' WHERE Name = '"..ply:SteamID().."';")
                     --creates the gun to spawn
                     local gun = ents.Create( VDInventory.Items[index] )
                     gun:SetPos( ply:GetPos() + Vector(0,0,100))
@@ -173,13 +175,8 @@ net.Receive("vectordealer_BuyWeapon", function( len, ply)
                     
                     net.Start("vectordealer_CloseFrame")
                     net.Send(ply)
-            else 
-           
+            end 
 
-            --SEVAN DO SOMETHING TO ANIMATE THE MENU HERE ??? 
-            print("gay")
-            --CALLED WHEN TRY TO BUY SOMETHING BUT NO MONIES
-        end
     end
     end
 end)
@@ -189,16 +186,16 @@ end)
 
 
 function grabPosAngle()
-    posang = {}
-    res = sql.QueryValue("SELECT COUNT(*) FROM VDPos WHERE Map = '"..game.GetMap().."';")
+    local posang = {}
+    local res = sql.QueryValue("SELECT COUNT(*) FROM VDPos WHERE Map = '"..game.GetMap().."';")
     --incase some shit breaks
     if not res then print(sql.LastError()) return end
     
     --grab random integer from 1 - max row of sql
-    rand = math.random(res)
+    local rand = math.random(res)
     --grabs pos from selected row
     res = sql.QueryRow("SELECT Positions FROM VDPos WHERE Map = '"..game.GetMap().."';",rand)
-    str = table.ToString(res)
+    local str = table.ToString(res)
     --trim
     str=string.sub(str,13,string.len(str)-3)
     --splitting to vector
@@ -214,7 +211,7 @@ function grabPosAngle()
     --splitting to vector
     str=string.Split(str, " ")
     table.insert(posang,Angle(str[1],str[2],str[3]))
-    model = sql.QueryValue("SELECT Model FROM VDSetModel;")
+    local model = sql.QueryValue("SELECT Model FROM VDSetModel;")
     return posang
 end
 
@@ -223,16 +220,17 @@ end
 
 function getVDInventory()
    --this is really stupid
-    randtbl = {}
-    guns = {{}}
-    res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
+    local randtbl = {}
+    local guns = {{}}
+    local randInventory = nil
+    local res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
     if not res then return end
     res = tonumber(res)
     --this lets us have differing sizes if they dont want a lot of items
     if res < 6 then 
-        randInventory = math.Rand(3,res)
+         randInventory = math.Rand(3,res)
     elseif res < 3 then
-        randInventory = math.Rand(1,res)
+         randInventory = math.Rand(1,res)
     else
         randInventory = math.Rand(3, 6)
     end
@@ -267,11 +265,14 @@ end
 --updates tables ^^^^^^^^^^^^^^^^^^^^^^
 --this shit is explained in cl_init.lua its a copy paste lol
 function appendToInv(guns)
-    VDInventory.Names = {}
-    VDInventory.Models = {} 
-    VDInventory.Items = {}
-    VDInventory.Prices = {}
-    num = #guns
+    local VDInventory.Names = {}
+    local VDInventory.Models = {} 
+    local VDInventory.Items = {}
+    local VDInventory.Prices = {}
+
+   
+
+    local num = #guns
     x=1
     for i=1, num do
         for k,v in pairs(guns[i]) do
@@ -300,7 +301,7 @@ function appendToInv(guns)
             end
         end
     end
-    VDInventory.numberOfItems = #VDInventory.Items
+    local VDInventory.numberOfItems = #VDInventory.Items
 
     
 end
