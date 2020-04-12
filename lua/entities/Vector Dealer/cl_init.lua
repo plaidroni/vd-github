@@ -228,30 +228,31 @@ function VDMenu.showMenu( )
     function updateShoppingCartModel()
         --VDMenu.ShoppingCartScroll:Clear()
         local i = 1
+        --iterating
         for k,v in pairs(dictionary)do
             local quantity = 0
             local shopmodel = ""
             if(isThisShitOdd(i))then
+                --checking if i is odd, so we can loop through the hashmap
                 print("here")
                 quantity = dictionary[v]
                 shopmodel = VDInventory.Models[indexof(VDInventory.Items,v)] 
 
             else 
+                --checking if even
                 print("here2")
                 shopmodel = VDInventory.Models[indexof(VDInventory.Items,k)] 
                 quantity = dictionary[k]
             end
             i=i+1
-            print(quantity)
-            print(shopmodel)
-            PrintTable(dictionary)
-            print(k.."dsd")
             if(indexof(shoppingCartListModels, shopmodel) == nil)then
                 if(quantity <= 1)then
+                    ----------dont worry about most of this, just icon-------
                     icon = vgui.Create( "DModelPanel", VDMenu.ShoppingCartScroll )
                     icon:SetMouseInputEnabled( true )
                     icon:SetSize( ScrH()/9, ScrW()/16)
                     xz,yz = icon:GetSize()
+                    --the 2 lines below should be working but are kind of fucky
                     icon:SetPos(0, #shoppingCartList * (ScrW()/16))
                     icon:SetModel( shopmodel ) -- you can only change colors on playermodels
                     function icon.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
@@ -264,25 +265,26 @@ function VDMenu.showMenu( )
                     icon:SetFOV( 45 )
                     icon:SetCamPos( Vector( size, size, size ) )
                     icon:SetLookAt( ( mn + mx ) * 0.5 )
-                    table.insert(shoppingCartList, icon)
+                    ----------dont worry about most of this, just icon-------
+                    table.insert(shoppingCartList, icon) -- putting the icon into a list, so that we can iterate over it later
                     PrintTable(shoppingCartList)
-                    print("herasz")
-                    table.insert(shoppingCartListModels, shopmodel)
+                    table.insert(shoppingCartListModels, shopmodel) -- for comparison
                 end
             else
+                ----------------creating the dlabel to go onto the dmodelpanel-----------------
                 local iconlabel = vgui.Create("DLabel", icon)
                 local x,y = VDMenu.ShoppingCartScroll:GetSize()
                 iconlabel:SetSize(x * .2, x * .2)
                 iconlabel:SetPos(0,0)
                 iconlabel:SetColor(Color(255,255,255,255))
                 iconlabel:SetFont("VDBuyMenuText")
+                ----------------creating the dlabel to go onto the dmodelpanel-----------------
             end
-            print(shoppingCartList[i-1])
-            PrintTable(shoppingCartList[i-1]:GetChildren())
-            print(i-1)
+            ------------setting the text when it goes above 2x--------------
             if(IsValid(shoppingCartList[i-1]:GetChildren()))then
                 shoppingCartList[i-1]:GetChildren()[1]:SetText("x"..quantity)
             end
+            ------------setting the text when it goes above 2x--------------
         end
     end
 --------------------------------FRAME FOR SHOPPING CART------------------------------------------
