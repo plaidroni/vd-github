@@ -299,6 +299,7 @@ function VDMenu.showMenu( )
                         3. unknown - lua/vgui/dlabel.lua:237
 
 
+                        there is a max quantity if u add 3 and idk just mess with it but i couldnt go past q 7 on the 3rd item maybe ran out of mem bc too many obj? idk but it shouldnt
 
                         have fun retard i fixed ur shit code XD
                      ]]
