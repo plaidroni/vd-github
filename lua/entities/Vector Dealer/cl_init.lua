@@ -218,6 +218,7 @@ function VDMenu.showMenu( )
         VDMenu.ShoppingCartScroll:Clear()
         shoppingCartList = {}
         shoppingCartListModels = {}
+        indexOfQuantity = 0
     end
     function VDMenu.ShoppingCartButton:DoClick()
         --PrintTable(VDInventory.Buylist)
@@ -237,7 +238,7 @@ function VDMenu.showMenu( )
 
             local quantity = 0
             local shopmodel = ""
-            
+            print(k)
             shopmodel = VDInventory.Models[indexof(VDInventory.Items,k)] 
             quantity = dictionary[k]
             nilBool = indexof(shoppingCartListModels, shopmodel) == nil
@@ -273,6 +274,8 @@ function VDMenu.showMenu( )
                 end
             elseif (not nilBool && quantity > 1) then
                 ----------------creating the dlabel to go onto the dmodelpanel-----------------
+                PrintTable(dictionary)
+                print("quantity = "..quantity)
                 if not shoppingCartList[indexOfQuantity]:HasChildren() then
 
                     local iconlabel = vgui.Create("DLabel", icon)
