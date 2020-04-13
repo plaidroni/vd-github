@@ -55,6 +55,7 @@ local iconIndex = nil
 local dictionary = {}
 local shoppingCartList = {}
 local shoppingCartListModels = {}
+local indexOfQuantity = 0
 --------------------------------VARIABLES--------------------------------
 
 
@@ -219,33 +220,30 @@ function VDMenu.showMenu( )
         shoppingCartListModels = {}
     end
     function VDMenu.ShoppingCartButton:DoClick()
-        PrintTable(VDInventory.Buylist)
+        --PrintTable(VDInventory.Buylist)
         net.Start("vectordealer_BuyWeapon")
         net.WriteTable(VDInventory.Buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
         net.SendToServer()
     end
+
+
     --grabs the quantity and model
     function updateShoppingCartModel()
         --VDMenu.ShoppingCartScroll:Clear()
-        local i = 1
+        
         --iterating
         for k,v in pairs(dictionary)do
+            
+
             local quantity = 0
             local shopmodel = ""
-            if(isThisShitOdd(i))then
-                --checking if i is odd, so we can loop through the hashmap
-                print("here")
-                quantity = dictionary[v]
-                shopmodel = VDInventory.Models[indexof(VDInventory.Items,v)] 
+            
+            shopmodel = VDInventory.Models[indexof(VDInventory.Items,k)] 
+            quantity = dictionary[k]
+            nilBool = indexof(shoppingCartListModels, shopmodel) == nil
 
-            else 
-                --checking if even
-                print("here2")
-                shopmodel = VDInventory.Models[indexof(VDInventory.Items,k)] 
-                quantity = dictionary[k]
-            end
-            i=i+1
-            if(indexof(shoppingCartListModels, shopmodel) == nil)then
+
+            if(nilBool)then
                 if(quantity <= 1)then
                     ----------dont worry about most of this, just icon-------
                     icon = vgui.Create( "DModelPanel", VDMenu.ShoppingCartScroll )
@@ -266,26 +264,59 @@ function VDMenu.showMenu( )
                     icon:SetCamPos( Vector( size, size, size ) )
                     icon:SetLookAt( ( mn + mx ) * 0.5 )
                     ----------dont worry about most of this, just icon-------
+                    
                     table.insert(shoppingCartList, icon) -- putting the icon into a list, so that we can iterate over it later
-                    PrintTable(shoppingCartList)
-                    table.insert(shoppingCartListModels, shopmodel) -- for comparison
+                    table.insert(shoppingCartListModels, shopmodel) -- for comparison\
+                   
+                    indexOfQuantity = indexOfQuantity + 1
+                   
                 end
-            else
+            elseif (not nilBool && quantity > 1) then
                 ----------------creating the dlabel to go onto the dmodelpanel-----------------
-                local iconlabel = vgui.Create("DLabel", icon)
-                local x,y = VDMenu.ShoppingCartScroll:GetSize()
-                iconlabel:SetSize(x * .2, x * .2)
-                iconlabel:SetPos(0,0)
-                iconlabel:SetColor(Color(255,255,255,255))
-                iconlabel:SetFont("VDBuyMenuText")
+                if not shoppingCartList[indexOfQuantity]:HasChildren() then
+
+                    local iconlabel = vgui.Create("DLabel", icon)
+                    local x,y = VDMenu.ShoppingCartScroll:GetSize()
+                    iconlabel:SetSize(x * .2, x * .2)
+                    iconlabel:SetPos(0,0)
+                    iconlabel:SetColor(Color(255,255,255,255))
+                    iconlabel:SetFont("VDBuyMenuText")
+                    iconlabel:SetText("x2")
                 ----------------creating the dlabel to go onto the dmodelpanel-----------------
-            end
-            ------------setting the text when it goes above 2x--------------
-            if(IsValid(shoppingCartList[i-1]:GetChildren()))then
-                shoppingCartList[i-1]:GetChildren()[1]:SetText("x"..quantity)
-            end
-            ------------setting the text when it goes above 2x--------------
+               
+                else
+                    child = shoppingCartList[indexOfQuantity]:GetChildren()
+                    child[1]:SetText("x"..quantity) 
+                end
+
+
+
+                --clearing cart and then redoing the quantiies gives this erre ^_^
+
+                    --[[[ERROR] addons/vector dealer/lua/entities/vector dealer/cl_init.lua:276: attempt to index a nil value
+                      1. updateShoppingCartModel - addons/vector dealer/lua/entities/vector dealer/cl_init.lua:276
+                       2. DoClick - addons/vector dealer/lua/entities/vector dealer/cl_init.lua:449
+                        3. unknown - lua/vgui/dlabel.lua:237
+
+
+
+                        have fun retard i fixed ur shit code XD
+                     ]]
+
+      
+                
+                
+
+
+
+
+
+                
+
+            end   
+              
         end
+        
     end
 --------------------------------FRAME FOR SHOPPING CART------------------------------------------
 
@@ -352,6 +383,7 @@ function VDMenu.showMenu( )
             VDInventory.CurName = VDInventory.Names[i]
             VDInventory.CurModel = VDInventory.Models[i]
             VDInventory.CurPrice = VDInventory.Prices[i]
+            VDMenu.PurchaseMenuLabel:SetText("Add the "..VDInventory.CurName.." to the cart for "..VDInventory.CurPrice.."$?")
             item = VDInventory.Items[i]
             iconIndex = i
             
@@ -398,7 +430,7 @@ function VDMenu.showMenu( )
     VDMenu.PurchaseMenuLabel = vgui.Create("DLabel", VDMenu.PurchaseMenu)
     VDMenu.PurchaseMenuLabel:SetSize(pmx * .8, pmy * .2)
     VDMenu.PurchaseMenuLabel:SetPos( pmx*.1, pmy*.4 )
-    VDMenu.PurchaseMenuLabel:SetText("Add the "..VDInventory.CurName.." to the cart for "..VDInventory.CurPrice.."$?")
+    VDMenu.PurchaseMenuLabel:SetText("")
     VDMenu.PurchaseMenuLabel:SetWrap(true)
     VDMenu.PurchaseMenuLabel:SetColor(Color(255,255,255,255))
     VDMenu.PurchaseMenuLabel:SetFont("VDBuyMenuText")
@@ -424,9 +456,6 @@ function VDMenu.showMenu( )
      -- updateList(VDInventory.Items[i], i)
         table.insert(VDInventory.Buylist.index, iconIndex)
         UpdateCart(VDInventory.Buylist.cart,iconIndex, currMoney)
-        net.Start("vectordealer_BuyWeapon")
-        net.WriteTable(VDInventory.Buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
-        net.SendToServer()
         updateShoppingCartModel()
     end
 
@@ -482,9 +511,8 @@ function Subtotal()
     subtotal = 0
     for k,v in pairs(VDInventory.Buylist.cart) do
         index = indexof(VDInventory.Items,v)
-
         price = VDInventory.Prices[index]
-
+     
         subtotal = subtotal + price
     end
     return subtotal
@@ -513,6 +541,7 @@ end
 --Attempts to make a map
 function updateCartInPanel(item)
     --this checks if the item is in the dictionary
+
    if setContains(dictionary, item) then
         --if it does it indexes the quantity by 1
        dictionary[item] = dictionary[item] + 1
@@ -521,10 +550,15 @@ function updateCartInPanel(item)
         --if not it adds to the dictionary and puts the quantity to 1
        
 
-        table.insert(dictionary,item)
+       table.insert(dictionary,item)
 
-        dictionary[item] = 1
+          
+       dictionary[item] = 1
+
+       table.remove(dictionary,1)
+            
     end
+    
     return dictionary
 end
 
@@ -596,19 +630,6 @@ end)
 ---------INITIALIZATION------------------------------
 
 
------------ODD CHECKER-------------------------------
-function isThisShitOdd(number)
-    if number % 2 == 0 then
-        return false
-    else 
-        return true
-    end
-end
------------ODD CHECKER-------------------------------
-
-
-
-
 ------------------------------------GRABBING INVENTORY------------------------------------------
 --lol
 net.Receive("TableSend", function()
@@ -669,7 +690,7 @@ net.Receive("TableSend", function()
     --this is so we can decide how to draw the menu based on the items
     VDInventory.numberOfItems = #VDInventory.Items
     VDInventory.CurName = VDInventory.Names[1]
-
+    VDInventory.CurPrice = VDInventory.Prices[1]
     
 
 end)
