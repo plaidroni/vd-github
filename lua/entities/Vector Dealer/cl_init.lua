@@ -55,7 +55,7 @@ local iconIndex = nil
 local dictionary = {}
 local shoppingCartList = {}
 local shoppingCartListModels = {}
-local indexOfQuantity = 0
+local shoppingCartListRef = {}
 --------------------------------VARIABLES--------------------------------
 
 
@@ -212,113 +212,122 @@ function VDMenu.showMenu( )
         draw.DrawText("CLEAR CART", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ShoppingCartButtonClear:GetTall() /4, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
     function VDMenu.ShoppingCartButtonClear:DoClick()
+        clearCart()
+    end
+
+
+    function clearCart() 
         VDInventory.Buylist.cart = {}
         VDInventory.Buylist.index = {}
         dictionary = {}
         VDMenu.ShoppingCartScroll:Clear()
         shoppingCartList = {}
         shoppingCartListModels = {}
-        indexOfQuantity = 0
     end
+
     function VDMenu.ShoppingCartButton:DoClick()
         --PrintTable(VDInventory.Buylist)
         net.Start("vectordealer_BuyWeapon")
         net.WriteTable(VDInventory.Buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
         net.SendToServer()
+        clearCart()
+        VDMenu.Frame:Close()
+
+
+
     end
 
 
     --grabs the quantity and model
-    function updateShoppingCartModel()
+    function updateShoppingCartModel(item)
         --VDMenu.ShoppingCartScroll:Clear()
         
+
+        local quantity = 0
+        local shopmodel = ""
+        local counter = 0
         --iterating
-        for k,v in pairs(dictionary)do
+        
+        counter = counter + 1
+           
+        shopmodel = VDInventory.Models[indexof(VDInventory.Items,item)] 
+        quantity = dictionary[item]
+        nilBool = indexof(shoppingCartListModels, shopmodel) == nil
+
             
+        if(nilBool)then
+            if(quantity <= 1)then
+                ----------dont worry about most of this, just icon-------
+                icon = vgui.Create( "DModelPanel", VDMenu.ShoppingCartScroll )
+                icon:SetMouseInputEnabled( true )
+                icon:SetSize( ScrH()/9, ScrW()/16)
+                xz,yz = icon:GetSize()
+                --the 2 lines below should be working but are kind of fucky
+                icon:SetPos(0, #shoppingCartList * (ScrW()/16))
+                icon:SetModel( shopmodel ) -- you can only change colors on playermodels
+                
 
-            local quantity = 0
-            local shopmodel = ""
-            print(k)
-            shopmodel = VDInventory.Models[indexof(VDInventory.Items,k)] 
-            quantity = dictionary[k]
-            nilBool = indexof(shoppingCartListModels, shopmodel) == nil
+                table.insert(shoppingCartListRef,shopmodel)
+                shoppingCartListRef[shopmodel] = icon
+                table.remove(shoppingCartListRef,1)
 
 
-            if(nilBool)then
-                if(quantity <= 1)then
-                    ----------dont worry about most of this, just icon-------
-                    icon = vgui.Create( "DModelPanel", VDMenu.ShoppingCartScroll )
-                    icon:SetMouseInputEnabled( true )
-                    icon:SetSize( ScrH()/9, ScrW()/16)
-                    xz,yz = icon:GetSize()
-                    --the 2 lines below should be working but are kind of fucky
-                    icon:SetPos(0, #shoppingCartList * (ScrW()/16))
-                    icon:SetModel( shopmodel ) -- you can only change colors on playermodels
-                    function icon.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
-                    local mn, mx = icon.Entity:GetRenderBounds()
-                    local size = mx.x * 2
-                    size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
-                    size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
-                    size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
 
-                    icon:SetFOV( 45 )
-                    icon:SetCamPos( Vector( size, size, size ) )
-                    icon:SetLookAt( ( mn + mx ) * 0.5 )
-                    ----------dont worry about most of this, just icon-------
-                    
-                    table.insert(shoppingCartList, icon) -- putting the icon into a list, so that we can iterate over it later
-                    table.insert(shoppingCartListModels, shopmodel) -- for comparison\
-                   
-                    indexOfQuantity = indexOfQuantity + 1
-                   
-                end
-            elseif (not nilBool && quantity > 1) then
-                ----------------creating the dlabel to go onto the dmodelpanel-----------------
-                PrintTable(dictionary)
-                print("quantity = "..quantity)
-                if not shoppingCartList[indexOfQuantity]:HasChildren() then
+                function icon.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
+                local mn, mx = icon.Entity:GetRenderBounds()
+                local size = mx.x * 2
 
-                    local iconlabel = vgui.Create("DLabel", icon)
-                    local x,y = VDMenu.ShoppingCartScroll:GetSize()
-                    iconlabel:SetSize(x * .2, x * .2)
-                    iconlabel:SetPos(0,0)
-                    iconlabel:SetColor(Color(255,255,255,255))
-                    iconlabel:SetFont("VDBuyMenuText")
-                    iconlabel:SetText("x2")
-                ----------------creating the dlabel to go onto the dmodelpanel-----------------
+                size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
+                size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
+                size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
+
+                icon:SetFOV( 45 )
+                icon:SetCamPos( Vector( size, size, size ) )
+                icon:SetLookAt( ( mn + mx ) * 0.5 )
+                ----------dont worry about most of this, just icon-------
+                
+                table.insert(shoppingCartList, icon) -- putting the icon into a list, so that we can iterate over it later
+                table.insert(shoppingCartListModels, shopmodel) -- for comparison\
                
-                else
-                    child = shoppingCartList[indexOfQuantity]:GetChildren()
-                    child[1]:SetText("x"..quantity) 
-                end
+            end
+
+
+            
+        elseif (not nilBool && quantity > 1) then
+            ----------------creating the dlabel to go onto the dmodelpanel-----------------
+            
+            
+            if not shoppingCartListRef[shopmodel]:HasChildren() then
+
+                local iconlabel = vgui.Create("DLabel", icon)
+                local x,y = VDMenu.ShoppingCartScroll:GetSize()
+                iconlabel:SetSize(x * .2, x * .2)
+                iconlabel:SetPos(0,0)
+                iconlabel:SetColor(Color(255,255,255,255))
+                iconlabel:SetFont("VDBuyMenuText")
+                iconlabel:SetText("x2")
+            ----------------creating the dlabel to go onto the dmodelpanel-----------------
+           
+            else
+                child = shoppingCartListRef[shopmodel]:GetChildren()[1]
+                child:SetText("x"..quantity) 
+            end
 
 
 
-                --clearing cart and then redoing the quantiies gives this erre ^_^
+            --clearing cart and then redoing the quantiies gives this erre ^_^
 
-                    --[[[ERROR] addons/vector dealer/lua/entities/vector dealer/cl_init.lua:276: attempt to index a nil value
-                      1. updateShoppingCartModel - addons/vector dealer/lua/entities/vector dealer/cl_init.lua:276
-                       2. DoClick - addons/vector dealer/lua/entities/vector dealer/cl_init.lua:449
-                        3. unknown - lua/vgui/dlabel.lua:237
-
-
-                        there is a max quantity if u add 3 and idk just mess with it but i couldnt go past q 7 on the 3rd item maybe ran out of mem bc too many obj? idk but it shouldnt
-
-                        have fun retard i fixed ur shit code XD
-                     ]]
-
-      
-                
-                
+                --[[[ERROR] addons/vector dealer/lua/entities/vector dealer/cl_init.lua:276: attempt to index a nil value
+                  1. updateShoppingCartModel - addons/vector dealer/lua/entities/vector dealer/cl_init.lua:276
+                   2. DoClick - addons/vector dealer/lua/entities/vector dealer/cl_init.lua:449
+                    3. unknown - lua/vgui/dlabel.lua:237
 
 
+                    there is a max quantity if u add 3 and idk just mess with it but i couldnt go past q 7 on the 3rd item maybe ran out of mem bc too many obj? idk but it shouldnt
 
-
-
-                
-
-            end   
-              
+                    have fun retard i fixed ur shit code XD
+                 ]]   
+          
         end
         
     end
@@ -461,7 +470,7 @@ function VDMenu.showMenu( )
      -- updateList(VDInventory.Items[i], i)
         table.insert(VDInventory.Buylist.index, iconIndex)
         UpdateCart(VDInventory.Buylist.cart,iconIndex, currMoney)
-        updateShoppingCartModel()
+        updateShoppingCartModel(item)
     end
 
     end
