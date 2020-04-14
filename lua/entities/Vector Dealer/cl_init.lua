@@ -353,6 +353,7 @@ function VDMenu.showMenu( )
         icon:SetFOV( 45 )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
+        icon:SetPos(x - xz/4, y - yz/2.25)
 
   ----------------------DRAWING ITEMS---------------------------------------
 
