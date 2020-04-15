@@ -24,6 +24,11 @@ surface.CreateFont("VDBuyMenuText", {
     size = ScrW()*.007,
     weight = 500
 })
+surface.CreateFont("VDItemText", {
+    font = "TargetID",
+    size = ScrW()*.014,
+    weight = 500
+})
 
 
 --------------------------------VARIABLES--------------------------------
@@ -94,14 +99,12 @@ function VDMenu.showMenu( )
 
     ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
     local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
-
         VDSit:SetSize( ScrH()/6, ScrW()/10.666)
         xz,yz = VDSit:GetSize()
         VDSit:SetPos((ScrW() / 2) - xz/2.05, (ScrH() / 2) - yz/1.5)
         VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
         function VDSit:LayoutEntity( Entity ) return end
     VDMenu.Frame.Paint = function()
-
         function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
         local eyepos = Vector(0, 0, eyecountdown) + VDSit.Entity:GetBonePosition(VDSit.Entity:LookupBone("ValveBiped.Bip01_Head1"))
@@ -180,10 +183,29 @@ function VDMenu.showMenu( )
     VDMenu.ShoppingCartFrame:SetTitle("")
     VDMenu.ShoppingCartFrame:MakePopup()
     local pmx, pmy = VDMenu.ShoppingCartFrame:GetSize()
+    local toplineShop = 100
+    local leftlineShop = 0
+    local rightlineShop = 0
+    local bottomlineShop = 100
+    local restShop = false
+    timer.Simple(1.5, function()
+        restShop = true
+    end)
     --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
     function VDMenu.ShoppingCartFrame:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
-        surface.DrawOutlinedRect( 0, 0, w, h )
+
+        rightlineShop = Lerp( 3 * FrameTime(), rightlineShop, h )
+        surface.DrawLine(w-1, 0, w-1, rightlineShop)
+        toplineShop = Lerp( 3 * FrameTime(), toplineShop, 0 )
+        surface.DrawLine(w, 0, toplineShop, 0)
+        
+        if restShop then
+            bottomlineShop = Lerp( 3 * FrameTime(), bottomlineShop, 0 )
+            surface.DrawLine(w, h-1, bottomlineShop, h-1)
+            leftlineShop = Lerp( 3 * FrameTime(), leftlineShop, h )
+            surface.DrawLine(0, 0, 0, leftlineShop)
+        end
     end
     VDMenu.ShoppingCartScroll = vgui.Create("DScrollPanel", VDMenu.ShoppingCartFrame)
     VDMenu.ShoppingCartScroll:SetPos(0,0)
@@ -191,21 +213,22 @@ function VDMenu.showMenu( )
     --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
     function VDMenu.ShoppingCartScroll:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
-        surface.DrawOutlinedRect( 0, 0, w, h )
     end
     VDMenu.ShoppingCartButton = vgui.Create("DButton", VDMenu.ShoppingCartFrame)
-    VDMenu.ShoppingCartButton:SetPos(pmx * .10, pmy * .93)
     VDMenu.ShoppingCartButton:SetSize(pmx * .80, pmy * .05)
+    VDMenu.ShoppingCartButton:SetPos(pmx * 2, pmy * .93)
     VDMenu.ShoppingCartButton:SetText("")
+    VDMenu.ShoppingCartButton:MoveTo(pmx * .1, pmy * .93, 1,1, .5)
     function VDMenu.ShoppingCartButton:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         surface.DrawOutlinedRect(0,0,w,h)
         draw.DrawText("CHECKOUT", "VDBuyMenuText", pmx*.5 - pmx * .10, VDMenu.ShoppingCartButton:GetTall() /4, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
     VDMenu.ShoppingCartButtonClear = vgui.Create("DButton", VDMenu.ShoppingCartFrame)
-    VDMenu.ShoppingCartButtonClear:SetPos(pmx * .10, pmy * .87)
+    VDMenu.ShoppingCartButtonClear:SetPos(pmx * 2, pmy * .87)
     VDMenu.ShoppingCartButtonClear:SetSize(pmx * .80, pmy * .05)
     VDMenu.ShoppingCartButtonClear:SetText("")
+    VDMenu.ShoppingCartButtonClear:MoveTo(pmx * .1, pmy * .87, 1,1, .5)
     function VDMenu.ShoppingCartButtonClear:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         surface.DrawOutlinedRect(0,0,w,h)
@@ -263,7 +286,8 @@ function VDMenu.showMenu( )
                 icon:SetSize( ScrH()/9, ScrW()/16)
                 xz,yz = icon:GetSize()
                 --the 2 lines below should be working but are kind of fucky
-                icon:SetPos(0, #shoppingCartList * (ScrW()/16))
+                icon:SetPos(xz, #shoppingCartList * (ScrW()/16))
+                icon:MoveTo(0, #shoppingCartList * (ScrW()/16), 1, 1, 0.5)
                 icon:SetModel( shopmodel ) -- you can only change colors on playermodels
                 
 
@@ -301,8 +325,8 @@ function VDMenu.showMenu( )
 
                 local iconlabel = vgui.Create("DLabel", icon)
                 local x,y = VDMenu.ShoppingCartScroll:GetSize()
-                iconlabel:SetSize(x * .2, x * .2)
-                iconlabel:SetPos(0,0)
+                iconlabel:SetSize(x, x)
+                iconlabel:SetPos(10,10)
                 iconlabel:SetColor(Color(255,255,255,255))
                 iconlabel:SetFont("VDBuyMenuText")
                 iconlabel:SetText("x2")
@@ -345,24 +369,21 @@ function VDMenu.showMenu( )
         
         local x = ScrW()/2 + math.sin( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 50
         local y = ScrH()/2 - math.cos( math.rad( 360/VDInventory.numberOfItems * i) ) * 250 - 15
-
         local icon = vgui.Create( "DModelPanel", VDMenu.Frame )
         icon:SetMouseInputEnabled( true )
         icon:SetSize( ScrH()/9, ScrW()/16)
         xz,yz = icon:GetSize()
         icon:SetPos(x - xz/4, y - yz/2.25)
         icon:SetModel( VDInventory.Models[i] ) -- you can only change colors on playermodels
-        function icon.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         local mn, mx = icon.Entity:GetRenderBounds()
         local size = mx.x * 2
         size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
         size = math.max( size, math.abs( mn.y ) + math.abs( mx.y ) )
         size = math.max( size, math.abs( mn.z ) + math.abs( mx.z ) )
-
         icon:SetFOV( 45 )
         icon:SetCamPos( Vector( size, size, size ) )
         icon:SetLookAt( ( mn + mx ) * 0.5 )
-        icon:SetPos(x - xz/4, y - yz/2.25)
+
 
   ----------------------DRAWING ITEMS---------------------------------------
 
@@ -400,6 +421,7 @@ function VDMenu.showMenu( )
             VDMenu.PurchaseMenuLabel:SetText("Add the "..VDInventory.CurName.." to the cart for "..VDInventory.CurPrice.."$?")
             item = VDInventory.Items[i]
             iconIndex = i
+
             
             --VDMenu.ShoppingCart:SetText("Add "..item.. " To Shopping Cart?")
            -- updateModelBuy()
@@ -430,11 +452,30 @@ function VDMenu.showMenu( )
     VDMenu.PurchaseMenu:SetTitle("")
     VDMenu.PurchaseMenu:MakePopup()
     local pmx, pmy = VDMenu.PurchaseMenu:GetSize()
+    local lerppos = .13
+    local topline = 0
+    local leftline = 0
+    local rightline = 0
+    local bottomline = 0
+    local rest = false
+    timer.Simple(1.5, function()
+        rest = true
+    end)
     --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
     function VDMenu.PurchaseMenu:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
-        surface.DrawOutlinedRect( 0, 0, w, h )
-        surface.DrawLine((pmx * .13), (pmy * .30), (pmx * .87), (pmy * .30))
+        lerppos = Lerp( 3 * FrameTime(), lerppos, .87 )
+        surface.DrawLine((pmx * .13), (pmy * .30), (pmx *lerppos) , (pmy * .30))
+        topline = Lerp( 3 * FrameTime(), topline, w )
+        surface.DrawLine(0, 0, topline, 0)
+        leftline = Lerp( 3 * FrameTime(), leftline, h )
+        surface.DrawLine(0, 0, 0, leftline)
+        if rest then
+            rightline = Lerp( 3 * FrameTime(), rightline, h )
+            surface.DrawLine(w-1, 0, w-1, rightline)
+            bottomline = Lerp( 3 * FrameTime(), bottomline, w )
+            surface.DrawLine(0, h-1, bottomline, h-1)
+        end
         draw.DrawText(VDInventory.CurName, "VDBuyMenuText", pmx*.5,pmy*.33, Color(255,255,255,255), TEXT_ALIGN_CENTER)
     end
 
@@ -453,9 +494,10 @@ function VDMenu.showMenu( )
    
 -------------------------------ADD TO CART--------------------------------------------------------
     VDMenu.ButtonPurchaseMenu = vgui.Create("DButton", VDMenu.PurchaseMenu)
-    VDMenu.ButtonPurchaseMenu:SetPos(pmx * .10, pmy * .90)
+    VDMenu.ButtonPurchaseMenu:SetPos(pmx * -1, pmy * .90)
     VDMenu.ButtonPurchaseMenu:SetSize(pmx * .80, pmy * .05)
     VDMenu.ButtonPurchaseMenu:SetText("")
+    VDMenu.ButtonPurchaseMenu:MoveTo(pmx * .10, pmy * .90, 1, 1, 0.5)
     function VDMenu.ButtonPurchaseMenu:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         surface.DrawOutlinedRect(0,0,w,h)
@@ -549,8 +591,6 @@ end
 
 
 ---------------------------------MAPPING FOR QUANTITY---------------------------
-
-
 
 --Attempts to make a map
 function updateCartInPanel(item)

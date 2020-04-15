@@ -127,14 +127,13 @@ function ENT:Use( Name, Caller )
             --uncomment later
 
 
-            --[[moneyAmount = Name:getDarkRPVar("money")
+            moneyAmount = Name:getDarkRPVar("money")
             if moneyAmount > 50000 then
-                
                 net.Start("vectordealer_UsePanel")
                 net.Send(Name)
             else
-            self:disappear()
-            end]]
+                self:disappear()
+            end
         end)
     end
 end
