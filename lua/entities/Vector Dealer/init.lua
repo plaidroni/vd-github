@@ -15,6 +15,8 @@ VDInventory = {}
 VDInventory.Items = {} 
 VDInventory.Models = {} 
 VDInventory.Prices = {}
+local VD_ply = ""
+local VD_moneyAmount
 model = sql.QueryValue("SELECT Model FROM VDSetModel;")
 game.AddParticles( "gmod_effects.pcf" )
 PrecacheParticleSystem( "generic_smoke" )
@@ -126,9 +128,9 @@ function ENT:Use( Name, Caller )
 
             --uncomment later
 
-
-            moneyAmount = Name:getDarkRPVar("money")
-            if moneyAmount > 50000 then
+            VD_ply = Name
+            VD_moneyAmount = Name:getDarkRPVar("money")
+            if VD_moneyAmount > 50000 then
                 net.Start("vectordealer_UsePanel")
                 net.Send(Name)
             else
@@ -144,40 +146,41 @@ end
 net.Receive("vectordealer_BuyWeapon", function( len, ply)    
     if not ply:IsPlayer() then return end
     local buylist = net.ReadTable()
-    
+    local currentprice = 0
+    local index = ""
+    local price = 0
     --OKAY SO BASICALLY THIS WHOLE THING IS LIKE REALLY NEAT SO WHAT THIS DOES IS RECIEVES THE SHOPPING CART TABLE AND THEN FINDS THE INDEX OF THE SPECIFIC ITEM IN THE
     --SYSTEM THAT WE HAVE AND THEN CREATES AN ITEM PER ONE AND SUBTRACTS THE MONEY FROM IT AUTOMATICALLY ITS BEAUTIFUL
+    PrintTable(buylist)
+    local currentlybought = {}
     for k,v in pairs(buylist.cart) do
         
         --Variables
-        local index = indexof(VDInventory.Items,v)
-        local price = VDInventory.Prices[index]
-        local moneyAmount = sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
-        moneyAmount = tonumber(moneyAmount)
-        
-        if (moneyAmount <= 0 || moneyAmount > 1000000) then return end
-
+        index = indexof(VDInventory.Items,v)
+        price = VDInventory.Prices[index]
+        currentprice = currentprice + price
         --Checks to see if sql works
-        if moneyAmount then
+        
+    end
+    if VD_moneyAmount then
             --Checks to see if u have a balance
-            if moneyAmount >= price then    
-                    --subtracts money
-                    local res=sql.Query("UPDATE VDCoin SET Money='"..moneyAmount - price .."' WHERE Name = '"..ply:SteamID().."';")
+            if VD_moneyAmount >= currentprice then    
+                VD_ply:setDarkRPVar("money", VD_ply:getDarkRPVar("money") - currentprice)
+                for k,v in pairs(buylist.cart)do
                     --creates the gun to spawn
                     local gun = ents.Create( VDInventory.Items[index] )
                     gun:SetPos( ply:GetPos() + Vector(0,0,100))
                     hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
                         if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
                     end )
-                    
+
                     gun:Spawn()
                     
-                    net.Start("vectordealer_CloseFrame")
-                    net.Send(ply)
-            end 
-
-    end
-    end
+                end
+                net.Start("vectordealer_CloseFrame")
+                net.Send(ply)
+            end
+        end
 end)
 
 

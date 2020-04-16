@@ -92,7 +92,7 @@ hook.Add("TTTEndRound", "TTTEndRound", OnRoundEnd)
 hook.Add( "PlayerDisconnected", "PlayerDisconnected", PlayerLeft)
 -- Adding a console command
 concommand.Add( "notificationadd", SendNotifToClients, nil, "Display an advert to the entire server using the custom Lividity Advert system", 0 )
-
+concommand.Add( "notificationsendto", SendIndividualNotif, nil, "Send a message to a specified player", 0 )
 
 
 
