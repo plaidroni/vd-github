@@ -3,12 +3,8 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 util.AddNetworkString("vectordealer_UsePanel")
 util.AddNetworkString("vectordealer_BuyWeapon")
-util.AddNetworkString("vectordealer_TeleportCasino")
-util.AddNetworkString("vectordealer_AlertPlayers")
-util.AddNetworkString("vectordealer_TimerOut")
 util.AddNetworkString("vectordealer_CloseFrame")
-util.AddNetworkString("TableSend")
-util.AddNetworkString( "MoneySend" )
+util.AddNetworkString("vectordealer_TableSend")
 -- CONFIG
 
 VDInventory = {}
@@ -88,26 +84,6 @@ end
 function ENT:Think()
     self:SetColor(Color(0,0,0,155))
 end
-net.Receive("vectordealer_TeleportCasino", function(len, ply)
-    if not ply:IsPlayer() then return end
-
-    res=sql.QueryValue("SELECT Money FROM VDCoin WHERE Name = '"..ply:SteamID().."';")
-    if(res) then
-        net.Start("MoneySend")
-        net.WriteInt(res)
-        net.Send(ply)
-    end
-
-
-    ply:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
-    function teleport()
-        ply:SetPos(Vector(1641.712646, -7108.523438, -134.968750))
-        ply:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
-    end
-    timer.Simple(1,teleport)
-    table.insert( playersincasino, ply )
- 
-end)
  
 function ENT:Use( Name, Caller )
     if Name:IsPlayer() then
@@ -122,11 +98,6 @@ function ENT:Use( Name, Caller )
         Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
         Name:Freeze(false)
         timer.Create("beepboop", 3, 1, function()
-            net.Start("vectordealer_UsePanel")
-            net.Send(Name)
-
-
-            --uncomment later
 
             VD_ply = Name
             VD_moneyAmount = Name:getDarkRPVar("money")
@@ -259,7 +230,7 @@ function getVDInventory()
     --updates tables ^^^^^^^^^^^^^^^^^^^^^^
     appendToInv(guns)
     --sends so we can interact w/ the menu
-    net.Start("TableSend")
+    net.Start("vectordealer_TableSend")
     net.WriteTable(guns)
     net.Send(player.GetAll()[1])
 end

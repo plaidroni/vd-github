@@ -686,7 +686,7 @@ end)
 
 ------------------------------------GRABBING INVENTORY------------------------------------------
 --lol
-net.Receive("TableSend", function()
+net.Receive("vectordealer_TableSend", function()
 
     --resets last inventory cycle
     VDInventory.Names = {}
