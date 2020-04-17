@@ -22,12 +22,13 @@ surface.CreateFont("LividityTitle", {
 })
 
 function showNotification(text, duration)
+	local ratio = 1.07722007722
 	Notifications.Notify.InUse = true
 	surface.SetFont( "Trebuchet24" )
 	local width, height = surface.GetTextSize(text)
 	if width < 60 then width = width + 10 end
 	Notifications.Frame = vgui.Create("DFrame")
-		Notifications.Frame:SetSize((width  * 1), 40)
+		Notifications.Frame:SetSize((width * ratio), 40)
 		Notifications.Frame:SetPos(0 - Notifications.Frame:GetWide(), ScrH() / 5)
 		Notifications.Frame:SetTitle("")
 		Notifications.Frame:ShowCloseButton(false)
@@ -35,13 +36,13 @@ function showNotification(text, duration)
 		-- painting the notification
 		local DurationBar = Notifications.Frame:GetWide()
 		function Notifications.Frame:Paint(w, h)
-			draw.RoundedBoxEx(5, 0, 0, width * 1, h, Color(72,72,72), false, true, false, true)
-			DurationBar = Lerp( 0.65 * FrameTime(), DurationBar, -2 )
-			draw.RoundedBoxEx(0, 0, Notifications.Frame:GetTall() - 10, DurationBar, 10, Color(170,0,0))
+			draw.RoundedBoxEx(5, 0, 0, width *ratio, h, Color(72,72,72), false, true, false, true)
+			DurationBar = Lerp( 0.45 * FrameTime(), DurationBar, -2 )
+			draw.RoundedBoxEx(0, 0, Notifications.Frame:GetTall() - 10, DurationBar - 20, 10, Color(170,0,0))
 		end
 
 	Notifications.Text = vgui.Create("DLabel", Notifications.Frame)
-		Notifications.Text:SetSize(Notifications.Frame:GetWide() - 7, Notifications.Frame:GetTall())
+		Notifications.Text:SetSize(Notifications.Frame:GetWide() -7 , Notifications.Frame:GetTall())
 		Notifications.Text:SetPos(8,3)
 		Notifications.Text:SetFont("LividityTEXT")
 		Notifications.Text:SetText(text)

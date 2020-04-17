@@ -22,26 +22,25 @@ PrecacheParticleSystem( "generic_smoke" )
 
 function ENT:disappear()
     sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos() )
-    local closeplayers = ents.FindInSphere( self:GetPos(), 500 )
-    for k,v in pairs(closeplayers) do
-        if v:IsPlayer() then
             --v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
-                function disappearinn()
-                    PosAngTbl = grabPosAngle()
-                    
-                    local randomvec = PosAngTbl[1]
-                    local randomangle = PosAngTbl[2]
-                    self:SetModel( model )
-                    self:SetPos(randomvec)
-                    self:SetAngles(randomangle)
-                    
-                   -- v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
-                   
-                    self:AddGestureSequence(351,false)
-                end
-                timer.Simple(1,disappearinn)
-        end
-    end 
+    function disappearinn()
+
+        PosAngTbl = grabPosAngle()
+        
+        local randomvec = PosAngTbl[1]
+        local randomangle = PosAngTbl[2]
+        self:SetModel( model )
+        self:SetPos(randomvec)
+
+        self:SetAngles(randomangle)
+        
+       -- v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
+       
+        self:AddGestureSequence(351,false)
+    end
+    timer.Simple(1,disappearinn)
+
+
 end
 
 function ENT:Initialize() 
@@ -58,6 +57,7 @@ function ENT:Initialize()
     self:SetSolid(  SOLID_BBOX )
     self:SetUseType( SIMPLE_USE )
     self:DropToFloor()
+    --The Vector Dealer has left. The Vector Dealer has arrived.
     RunConsoleCommand( "notificationadd", "The Vector Dealer has arrived." )
     self.sound = CreateSound(self, Sound("ambient/wind/wind_bass.wav"))
     self.sound:SetSoundLevel(52)
@@ -74,7 +74,7 @@ function ENT:Initialize()
                 end
             end
         end
-        RunConsoleCommand( "notificationadd", "The Vector Dealer has left." )
+        RunConsoleCommand( "Currency_Notificationadd", "The Vector Dealer has left." )
         self:Remove()
     end)
 end

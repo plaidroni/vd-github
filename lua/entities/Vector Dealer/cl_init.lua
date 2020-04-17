@@ -393,29 +393,6 @@ function VDMenu.showMenu( )
 
 
 
-
-
-
--------------------------------------CHECKOUT-----------------------------------
-
-        ----------------this needs to be in a separate checkout screen-------------------------------------------------
-        ---text = "Buy for $"..VDInventory.Prices[i].."?"
-        --[[VDMenu.BuyButton = vgui.Create( "DButton", VDMenu.Frame )
-        VDMenu.BuyButton:SetText( "ur mom" )
-        VDMenu.BuyButton:SetPos( 0,0 )
-        VDMenu.BuyButton:SetSize( ScrW() / 15, ScrH() / 25 )
-
-        VDMenu.BuyButton.DoClick = function()
-            PrintTable(buylist)
-            net.Start("vectordealer_BuyWeapon")
-            net.WriteTable(buylist) --  [ERROR] lua/entities/vector dealer/cl_init.lua:106: bad argument #2 to 'WriteInt' (number expected, got no value)
-            net.SendToServer()
-        end]]--
-         ---text = "Buy for $"..VDInventory.Prices[i].."?"
--------------------------------------CHECKOUT-----------------------------------
-       
-
-
 -----------------------------------ICON------------------------------------------
         --clicking on the item itself sets the next to whatever the curr clicked item
         icon.DoClick = function()

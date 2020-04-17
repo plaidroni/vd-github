@@ -221,6 +221,24 @@ end
 concommand.Add( "VDDeleteWep", VDDeleteWep, nil, "", {FCVAR_DONTRECORD} )
 
 
+--[[---------------------------------------------------------
+   Name:	VDInitialize
+   Desc:	Allows admins to initialize the Vector Dealer
+-----------------------------------------------------------]]  
+local function VDInitialize(player, command, name)
+	if( !player:IsAdmin()) then return end
+	--Checks if inputted Model is in the db
+	local randTime = math.Round(math.Rand(0, 14400))
+	if(math.Round(RealTime()))then
+		local vecd = ents.Create("vector dealer")
+		vecd:Spawn()
+		
+		local randTime = math.Round(math.Rand(0, 14400))
+	end 
+end
+concommand.Add( "VDInitialize", VDInitialize, nil, "", {FCVAR_DONTRECORD} )
+
+		
 
 
 
@@ -232,6 +250,7 @@ local function VDHelp( player, command)
 	--Pos
 	print("")
 	print("")
+
 	print("")
 	print("")
 	print("Position:")
