@@ -2,6 +2,30 @@
 function tables_exist()
     
     
+-----------------------------MIN AMT--------------------------------
+    if (sql.TableExists("VDMinAmt")) then
+        Msg("Table already exist!\n")
+    elseif (!sql.TableExists("VDMinAmt")) then
+        query = "CREATE TABLE VDMinAmt ( Money INTEGER )"
+        result = sql.Query(query)
+        print(result)
+        sql.Query("INSERT INTO VDMinAmt(Money) Values(50000)")
+
+
+
+        if (sql.TableExists("VDMinAmt")) then
+            Msg("Success! table created \n")
+
+        else
+            Msg("Something went wrong with the VDMinAmt query! \n")
+            Msg( sql.LastError( result ) .. "\n")
+        end
+    end
+    -----------------------------MIN AMT--------------------------------
+
+
+-------------------------------POS-----------------------------------
+
     if (sql.TableExists("VDPos")) then
         Msg("Table already exist!\n")
     elseif (!sql.TableExists("VDPos")) then
@@ -16,6 +40,11 @@ function tables_exist()
             Msg( sql.LastError( result ) .. "\n")
         end
     end
+-------------------------------POS-----------------------------------
+
+
+
+------------------------MODEL-------------------------------------
 
 
     if (sql.TableExists("VDModel")) then
@@ -49,21 +78,11 @@ function tables_exist()
             Msg( sql.LastError( result ) .. "\n")
         end
     end
+    ------------------------MODEL-------------------------------------
 
-    if (sql.TableExists("VDCoin")) then
-        Msg("Table already exist!\n")
-    elseif (!sql.TableExists("VDCoin")) then
-        query = "CREATE TABLE VDCoin ( Name TEXT, Money INTEGER )"
-        result = sql.Query(query)
-        print(result)
- 
-        if (sql.TableExists("VDCoin")) then
-            Msg("Success! table created \n")
-        else
-            Msg("Something went wrong with the VDCoin query! \n")
-            Msg( sql.LastError( result ) .. "\n")
-        end
-    end
+
+
+    ----------------------INVENTORY-----------------------------------------------------
 
     if (sql.TableExists("VDInventory")) then
         Msg("Table already exist!\n")
@@ -86,7 +105,7 @@ function tables_exist()
             Msg( sql.LastError( result ) .. "\n")
         end
     end
-
+     ----------------------INVENTORY-----------------------------------------------------
 
 end
 
