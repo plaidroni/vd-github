@@ -31,9 +31,6 @@ function ENT:disappear()
                     
                     local randomvec = PosAngTbl[1]
                     local randomangle = PosAngTbl[2]
-                    for g,gg in pairs(player.GetAll()) do
-                        v:SetPos(randomvec)
-                    end
                     self:SetModel( model )
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
@@ -139,7 +136,7 @@ net.Receive("vectordealer_BuyWeapon", function( len, ply)
                 VD_ply:setDarkRPVar("money", VD_ply:getDarkRPVar("money") - currentprice)
                 for k,v in pairs(buylist.cart)do
                     --creates the gun to spawn
-                    local gun = ents.Create( VDInventory.Items[index] )
+                    local gun = ents.Create( buylist.cart[k] )
                     gun:SetPos( ply:GetPos() + Vector(0,0,100))
                     hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
                         if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
