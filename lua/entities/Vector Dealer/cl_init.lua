@@ -250,6 +250,7 @@ function VDMenu.showMenu( )
         VDMenu.ShoppingCartScroll:Clear()
         shoppingCartList = {}
         shoppingCartListModels = {}
+        Subtotal()
     end
 
     function VDMenu.ShoppingCartButton:DoClick()
