@@ -549,8 +549,6 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     function VDMenu.ExitButton:Paint(w, h)
         surface.SetDrawColor( 255, 255, 255, 255)
         surface.DrawLine(w * .10,0,w * .10,h)
-        surface.DrawLine( w * .2, h * .05, w * .05, h* .95)
-        surface.DrawLine( w * .2, h * .95, w * .95, h* .05)
         --surface.DrawLine(w * .11,w*.6,)
     end
     VDMenu.ExitButton:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
