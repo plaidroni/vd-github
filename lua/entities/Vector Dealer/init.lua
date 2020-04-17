@@ -92,24 +92,27 @@ function ENT:Use( Name, Caller )
         local canbuy = VD_moneyAmount > minamt
         
  
+       
+        z = z + 60
+        
+        Name:Freeze(true)
+        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+      
+        Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
+        Name:Freeze(false)
+       
         if canbuy then
-            z = z + 60
-            
-            Name:Freeze(true)
-            ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-            ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-          
-            Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
-            Name:Freeze(false)
-           
-
             timer.Create("beepboop", 3, 1, function()
                 net.Start("vectordealer_UsePanel")
                 net.Send(Name)
-                
-            end)
+            
+                end)
 
         else
+            timer.Create("fadein", 3, 1, function()
+                Name:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0.2)
+            end)
             self:disappear()
         end
 
