@@ -5,6 +5,9 @@ util.AddNetworkString("vectordealer_UsePanel")
 util.AddNetworkString("vectordealer_BuyWeapon")
 util.AddNetworkString("vectordealer_CloseFrame")
 util.AddNetworkString("vectordealer_TableSend")
+
+resource.AddFile("materials/VGUI/entities/VectorDealer_icon.vmt");
+resource.AddFile("materials/VGUI/entities/VectorDealer_icon.vtf");
 -- CONFIG
 
 VDInventory = {}

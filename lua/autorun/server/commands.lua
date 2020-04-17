@@ -1,4 +1,8 @@
 
+----------------------------------------------------------POS------------------------------------------------
+
+
+
 --[[---------------------------------------------------------
    Name:	VDSetPos
    Desc:	Allows admins to get current Pos and input into VDPos.
@@ -74,11 +78,12 @@ local function VDClearPos( player, command)
 end
 concommand.Add( "VDClearPos", VDClearPos, nil, "", {FCVAR_DONTRECORD} )
 
+----------------------------------------------------------POS------------------------------------------------
 
 
 
 
-
+-----------------------------------------MODEL-------------------------------------------------------------
 
 
 --[[---------------------------------------------------------
@@ -135,6 +140,10 @@ end
 concommand.Add( "VDClearModel", VDClearModel, nil, "", {FCVAR_DONTRECORD} )
 
 
+
+
+
+
 --[[---------------------------------------------------------
    Name:	VDDeleteModel
    Desc:	Allows admins to delete specific models
@@ -156,7 +165,10 @@ concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
 
 
 
+-----------------------------------------MODEL-------------------------------------------------------------
 
+
+--------------------------------------------WEP-----------------------------------------------------------
 
 
 
@@ -164,9 +176,9 @@ concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
    Name:	VDAddWep
    Desc:	Allows admins to add a model
 -----------------------------------------------------------]]  
-local function VDAddWep(player, command, wep)
+local function VDAddWep(player, command, model)
 	if( !player:IsAdmin()) then return end
-	query = sql.Query("INSERT INTO VDInventory(name,model,gun,cost) VALUES('"..model[1].."', '"..model[2].."', '"..model[3].."','"..model[4].."'');")
+	query = sql.Query("INSERT INTO VDInventory(name,model,gun,price) VALUES('"..model[1].."', '"..model[2].."', '"..model[3].."','"..model[4].."');")
 	if not query then print(sql.LastError())
 	else print("Success!")
 	end		
@@ -219,6 +231,12 @@ local function VDDeleteWep(player, command, name)
 	end	
 end
 concommand.Add( "VDDeleteWep", VDDeleteWep, nil, "", {FCVAR_DONTRECORD} )
+
+--------------------------------------------WEP-----------------------------------------------------------
+
+
+
+
 
 
 --[[---------------------------------------------------------
@@ -274,9 +292,18 @@ local function VDHelp( player, command)
 	print("")
 	print("Gun:")
 	print("")
-	print("VDAddWep String name, String model, String entity, Integer cost -- (EX: VDAddWep 'Famas' 'models/weapons/w_tct_famas.mdl' 'm9k_famas' 15000) allows admins to add a weapon to the VDShop")
+	print("VDAddWep String name, String model, String entity, Integer cost -- (EX: VDAddWep Famas models/weapons/w_tct_famas.mdl m9k_famas 15000) allows admins to add a weapon to the VDShop")
 	print("VDViewWep -- Displays all guns in the shop")
 	print("VDClearWep -- Deletes all guns from the database")
 	print("VDDeleteWep String gun -- (EX: VDDeleteWep 'm9k_famas') Deletes the gun with specified name")
+
+	--misc
+	print("")
+	print("")
+	print("Misc:")
+	print("")
+	print("VDInitialize -- Starts the Vector Dealer")
+
+
 end
 concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )
