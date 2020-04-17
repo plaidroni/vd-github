@@ -25,20 +25,20 @@ function ENT:disappear()
     local closeplayers = ents.FindInSphere( self:GetPos(), 500 )
     for k,v in pairs(closeplayers) do
         if v:IsPlayer() then
-            v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
+            --v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
                 function disappearinn()
                     PosAngTbl = grabPosAngle()
                     
                     local randomvec = PosAngTbl[1]
                     local randomangle = PosAngTbl[2]
-                    for g,gg in pairs(player.GetAll()) do
+                    --[[for g,gg in pairs(player.GetAll()) do
                         v:SetPos(randomvec)
-                    end
+                    end]]
                     self:SetModel( model )
                     self:SetPos(randomvec)
                     self:SetAngles(randomangle)
                     
-                    v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
+                   -- v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
                    
                     self:AddGestureSequence(351,false)
                 end
@@ -87,27 +87,38 @@ end
  
 function ENT:Use( Name, Caller )
     if Name:IsPlayer() then
-        local x,y,z  = Name:GetPos():Unpack()
         
+        VD_ply = Name
+        VD_moneyAmount = Name:getDarkRPVar("money")
+        local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
+        local x,y,z  = Name:GetPos():Unpack()
+        local canbuy = VD_moneyAmount > minamt
+        
+ 
+        if canbuy then
+            z = z + 60
+            
+            Name:Freeze(true)
+            ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+            ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+          
+            Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
+            Name:Freeze(false)
+           
 
-        z = z + 60
-        Name:Freeze(true)
-        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-      
-        Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
-        Name:Freeze(false)
-        timer.Create("beepboop", 3, 1, function()
-
-            VD_ply = Name
-            VD_moneyAmount = Name:getDarkRPVar("money")
-            if VD_moneyAmount > 50000 then
+            timer.Create("beepboop", 3, 1, function()
                 net.Start("vectordealer_UsePanel")
                 net.Send(Name)
-            else
-                self:disappear()
-            end
-        end)
+                
+            end)
+
+        else
+            self:disappear()
+        end
+
+
+
+
     end
 end
  
