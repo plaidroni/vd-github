@@ -27,9 +27,7 @@ function ENT:Initialize()
     getVDInventory()
     self:SetModel( model )
     self:DropToFloor()
-    self:AddGesture( 351,false )
-    print(self:IsPlayingGesture(351))
-
+    
 
 
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
@@ -56,9 +54,9 @@ function ENT:Initialize()
     local randomvec = PosAngTbl[1]
     local randomangle = PosAngTbl[2]
   
-    self:SetPos(randomvec)
+    --self:SetPos(randomvec)
      
-    self:SetAngles(randomangle)  
+    --self:SetAngles(randomangle)  
 
     sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos())
 
@@ -83,6 +81,9 @@ end
 
 function ENT:Think()
     self:SetColor(Color(0,0,0,155))
+    self:AddGestureSequence( 351,false )
+    print(self:IsPlayingGesture(351))
+
 end
 
 
