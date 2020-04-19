@@ -60,7 +60,7 @@ function ENT:Initialize()
      
     self:SetAngles(randomangle)  
 
-    sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos() 
+    sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos())
 
 
 
