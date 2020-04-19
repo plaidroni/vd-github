@@ -6,6 +6,7 @@ util.AddNetworkString("vectordealer_BuyWeapon")
 util.AddNetworkString("vectordealer_CloseFrame")
 util.AddNetworkString("vectordealer_TableSend")
 
+
 -- CONFIG
 
 VDInventory = {}
@@ -23,7 +24,9 @@ PrecacheParticleSystem( "generic_smoke" )
 
 
 
-function ENT:Initialize() 
+function ENT:Initialize()
+
+
     getVDInventory()
     self:SetModel( model )
     self:DropToFloor()
@@ -54,9 +57,9 @@ function ENT:Initialize()
     local randomvec = PosAngTbl[1]
     local randomangle = PosAngTbl[2]
   
-    --self:SetPos(randomvec)
+    self:SetPos(randomvec)
      
-    --self:SetAngles(randomangle)  
+    self:SetAngles(randomangle)  
 
     sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos())
 
@@ -76,26 +79,27 @@ function ENT:Initialize()
     end)
 end
 
-
+--ulx.fancyLogAdmin( calling_ply, "#A gave #T $#i", target_ply, amount )
 
 
 function ENT:Think()
     self:SetColor(Color(0,0,0,155))
     self:AddGestureSequence( 351,false )
-    print(self:IsPlayingGesture(351))
-
 end
 
 
  
-function ENT:Use( Name, Caller )
+function ENT:Use( Name )
+    
+    --Name:setDarkRpVar("money", 33)
+  
     if Name:IsPlayer() then
 
+    
         VD_moneyAmount = Name:getDarkRPVar("money")
         local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
         local x,y,z  = Name:GetPos():Unpack()
         local canbuy = VD_moneyAmount > minamt
-        
         z = z + 60
         
         Name:Freeze(true)
@@ -109,8 +113,10 @@ function ENT:Use( Name, Caller )
         if canbuy then
             timer.Create("beepboop", 3, 1, function()
                 net.Start("vectordealer_UsePanel")
-                net.Send(Name)
                 
+                net.WriteEntity(Name)
+                
+                net.Send(Name)
                 end)
 
         else
@@ -170,9 +176,14 @@ function getVDInventory()
     local randtbl = {}
     local guns = {{}}
     local randInventory = nil
+    
+
     local res = sql.QueryValue("SELECT COUNT(*) FROM VDInventory;")
     if not res then return end
     res = tonumber(res)
+    
+
+
     --this lets us have differing sizes if they dont want a lot of items
     if res < 6 then 
          randInventory = math.Rand(3,res)
@@ -192,6 +203,9 @@ function getVDInventory()
     end
     
 
+
+
+
     for i=1,randInventory do
         --gives me a random value from created table
         res = randtbl[math.random( 1, #randtbl )]
@@ -201,6 +215,8 @@ function getVDInventory()
         guns[i] = sql.QueryRow("SELECT * FROM VDInventory;",res)
     end
     
+
+
     --updates tables ^^^^^^^^^^^^^^^^^^^^^^
     appendToInv(guns)
     --sends so we can interact w/ the menu
@@ -216,10 +232,10 @@ end
 --updates tables ^^^^^^^^^^^^^^^^^^^^^^
 --this shit is explained in cl_init.lua its a copy paste lol
 function appendToInv(guns)
-    VDInventory.Names = {}
-    VDInventory.Models = {} 
-    VDInventory.Items = {}
-    VDInventory.Prices = {}
+     VDInventory.Names = {}
+     VDInventory.Models = {} 
+     VDInventory.Items = {}
+     VDInventory.Prices = {}
 
    
 
@@ -260,28 +276,29 @@ end
 
 
 
-function indexof(values,item)
-    local index = {}
-    for k,v in pairs(values) do
-        index[v] = k
-    end
-    return index[item]
-end
-
 
 
 
 
 net.Receive("vectordealer_BuyWeapon", function( len, ply)    
     if not ply:IsPlayer() then return end
+    
+
     local buylist = net.ReadTable()
     local currentprice = 0
     local index = ""
     local price = 0
+    local money = ply:getDarkRPVar("money")
+
+
+
+
     --OKAY SO BASICALLY THIS WHOLE THING IS LIKE REALLY NEAT SO WHAT THIS DOES IS RECIEVES THE SHOPPING CART TABLE AND THEN FINDS THE INDEX OF THE SPECIFIC ITEM IN THE
     --SYSTEM THAT WE HAVE AND THEN CREATES AN ITEM PER ONE AND SUBTRACTS THE MONEY FROM IT AUTOMATICALLY ITS BEAUTIFUL
-    PrintTable(buylist)
-    local currentlybought = {}
+
+
+
+
     for k,v in pairs(buylist.cart) do
         
         --Variables
@@ -290,24 +307,52 @@ net.Receive("vectordealer_BuyWeapon", function( len, ply)
         currentprice = currentprice + price
         --Checks to see if sql works
         
+
     end
+
+
     if VD_moneyAmount then
         --Checks to see if u have a balance
+
+
         if VD_moneyAmount >= currentprice then    
-            VD_ply:setDarkRPVar("money", VD_ply:getDarkRPVar("money") - currentprice)
+            ply:setDarkRPVar("money", money - currentprice)
+            
+
+
             for k,v in pairs(buylist.cart)do
                 --creates the gun to spawn
+                
+
                 local gun = ents.Create( buylist.cart[k] )
                 gun:SetPos( ply:GetPos() + Vector(0,0,100))
                 hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
+                
                     if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
+
                 end )
 
                 gun:Spawn()
                 
             end
+            
+
             net.Start("vectordealer_CloseFrame")
             net.Send(ply)
+
+
         end
     end
 end)
+
+
+
+
+
+function indexof(values,item)
+    local index = {}
+    for k,v in pairs(values) do
+        index[v] = k
+    end
+    return index[item]
+end

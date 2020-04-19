@@ -52,7 +52,6 @@ LNBuyText = "text"
 local menuOpen = false
 local modelSet = false
 local clickedItem = 0
-local currMoney = 0
 local item = 0
 local scrw9 = ScrW() / 9
 local scrh16 = ScrH() / 16
@@ -61,6 +60,7 @@ local dictionary = {}
 local shoppingCartList = {}
 local shoppingCartListModels = {}
 local shoppingCartListRef = {}
+local VDPly = ""
 --------------------------------VARIABLES--------------------------------
 
 
@@ -75,9 +75,6 @@ function VDMenu.showMenu( )
 -------------------------FRAME---------------------------------------
     --effects based on clicking on VDealer
    
-    net.Receive("MoneySend",function(ply,money)
-        currMoney = Money
-    end)
 
     x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
@@ -104,6 +101,7 @@ function VDMenu.showMenu( )
         VDSit:SetPos((ScrW() / 2) - xz/2.05, (ScrH() / 2) - yz/1.5)
         VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
         function VDSit:LayoutEntity( Entity ) return end
+    
     VDMenu.Frame.Paint = function()
         function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
@@ -511,7 +509,7 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
       
      -- updateList(VDInventory.Items[i], i)
         table.insert(VDInventory.Buylist.index, iconIndex)
-        UpdateCart(VDInventory.Buylist.cart,iconIndex, currMoney)
+        UpdateCart(VDInventory.Buylist.cart,iconIndex)
         updateShoppingCartModel(item)
     end
         
@@ -549,7 +547,7 @@ end
 ----------------------------------UPDATING THE CART--------------------------------------
 --Prints the Updated Cart When an item is added
 
-function UpdateCart(tbl,index, money)
+function UpdateCart(tbl,index)
     subtotal = Subtotal(tbl)
     hashmap = updateCartInPanel(VDInventory.Items[index])
 end
@@ -670,7 +668,9 @@ function ENT:Draw()
 end
 
 --opens the menu when pressed on
-net.Receive("vectordealer_UsePanel", function( len )
+net.Receive("vectordealer_UsePanel", function( len, ply )
+    print(ply)
+    VDPly = ply
     VDMenu.showMenu()
 end)
 
