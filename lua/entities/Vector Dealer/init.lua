@@ -6,14 +6,13 @@ util.AddNetworkString("vectordealer_BuyWeapon")
 util.AddNetworkString("vectordealer_CloseFrame")
 util.AddNetworkString("vectordealer_TableSend")
 
-resource.AddFile("materials/VGUI/entities/VectorDealer_icon.vmt");
-resource.AddFile("materials/VGUI/entities/VectorDealer_icon.vtf");
 -- CONFIG
 
 VDInventory = {}
 VDInventory.Items = {} 
 VDInventory.Models = {} 
 VDInventory.Prices = {}
+VDTimer = {3600, 7200, 10800, 14400}
 local VD_ply = ""
 local VD_moneyAmount
 model = sql.QueryValue("SELECT Model FROM VDSetModel;")
@@ -23,82 +22,83 @@ PrecacheParticleSystem( "generic_smoke" )
 -- END CONFIG
 
 
-function ENT:disappear()
-    sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos() )
-            --v:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 1, 0 )
-    function disappearinn()
-
-        PosAngTbl = grabPosAngle()
-        
-        local randomvec = PosAngTbl[1]
-        local randomangle = PosAngTbl[2]
-        self:SetModel( model )
-        self:SetPos(randomvec)
-
-        self:SetAngles(randomangle)
-        
-       -- v:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0 )
-       
-        self:AddGestureSequence(351,false)
-    end
-    timer.Simple(1,disappearinn)
-
-
-end
 
 function ENT:Initialize() 
     getVDInventory()
     self:SetModel( model )
+    self:DropToFloor()
+    self:AddGesture( 351,false )
+    print(self:IsPlayingGesture(351))
+
+
+
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
-   -- self:CapabilitiesAdd( CAP_TURN_HEAD )
     self:SetSchedule( SCHED_NPC_FREEZE )
-    
     self:SetHullType( HULL_HUMAN )
     self:SetHullSizeNormal( )
     self:SetNPCState( NPC_STATE_IDLE )
+    
+
     self:StartEngineSchedule( SCHED_IDLE_STAND )
     self:SetSolid(  SOLID_BBOX )
     self:SetUseType( SIMPLE_USE )
-    self:DropToFloor()
-    --The Vector Dealer has left. The Vector Dealer has arrived.
+    
+
     RunConsoleCommand( "notificationadd", "The Vector Dealer has arrived." )
     self.sound = CreateSound(self, Sound("ambient/wind/wind_bass.wav"))
     self.sound:SetSoundLevel(52)
     self.sound:PlayEx(1, 100)
-    playersincasino = {}
-    self:disappear()
-    timer.Create("Deletion",3600,1,function()
-        sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos())
-        for keys,players in pairs(playersincasino) do
-            playersincasino = ents.FindInSphere( Vector(1851.474609, -7117.328613, -134.968750), 500 )
-            for pici,picv in pairs(playersincasino) do
-                if picv == players then
-                    players:Kill()
-                end
-            end
-        end
+
+
+            
+    PosAngTbl = grabPosAngle()
+    
+    local randomvec = PosAngTbl[1]
+    local randomangle = PosAngTbl[2]
+  
+    self:SetPos(randomvec)
+     
+    self:SetAngles(randomangle)  
+
+    sound.Play( "npc/combine_soldier/vo/phantom.wav", self:GetPos() 
+
+
+
+
+    timer.Create("disappear", 1200, 0, function()
+        
         RunConsoleCommand( "Currency_Notificationadd", "The Vector Dealer has left." )
         self:Remove()
+
+        timer.Create("respawn", VDTimer[ #VDTimer ], 1, function()
+            
+            RunConsoleCommand("VDInitialize")
+
+        end)
     end)
 end
+
+
+
+
 function ENT:Think()
     self:SetColor(Color(0,0,0,155))
 end
+
+
  
 function ENT:Use( Name, Caller )
     if Name:IsPlayer() then
-        
-        VD_ply = Name
+
         VD_moneyAmount = Name:getDarkRPVar("money")
         local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
         local x,y,z  = Name:GetPos():Unpack()
         local canbuy = VD_moneyAmount > minamt
         
- 
-       
         z = z + 60
         
         Name:Freeze(true)
+
         ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
         ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
       
@@ -109,18 +109,14 @@ function ENT:Use( Name, Caller )
             timer.Create("beepboop", 3, 1, function()
                 net.Start("vectordealer_UsePanel")
                 net.Send(Name)
-            
+                
                 end)
 
         else
             timer.Create("fadein", 3, 1, function()
                 Name:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0.2)
             end)
-            self:disappear()
         end
-
-
-
 
     end
 end
@@ -128,45 +124,6 @@ end
 
 
 
-net.Receive("vectordealer_BuyWeapon", function( len, ply)    
-    if not ply:IsPlayer() then return end
-    local buylist = net.ReadTable()
-    local currentprice = 0
-    local index = ""
-    local price = 0
-    --OKAY SO BASICALLY THIS WHOLE THING IS LIKE REALLY NEAT SO WHAT THIS DOES IS RECIEVES THE SHOPPING CART TABLE AND THEN FINDS THE INDEX OF THE SPECIFIC ITEM IN THE
-    --SYSTEM THAT WE HAVE AND THEN CREATES AN ITEM PER ONE AND SUBTRACTS THE MONEY FROM IT AUTOMATICALLY ITS BEAUTIFUL
-    PrintTable(buylist)
-    local currentlybought = {}
-    for k,v in pairs(buylist.cart) do
-        
-        --Variables
-        index = indexof(VDInventory.Items,v)
-        price = VDInventory.Prices[index]
-        currentprice = currentprice + price
-        --Checks to see if sql works
-        
-    end
-    if VD_moneyAmount then
-            --Checks to see if u have a balance
-            if VD_moneyAmount >= currentprice then    
-                VD_ply:setDarkRPVar("money", VD_ply:getDarkRPVar("money") - currentprice)
-                for k,v in pairs(buylist.cart)do
-                    --creates the gun to spawn
-                    local gun = ents.Create( buylist.cart[k] )
-                    gun:SetPos( ply:GetPos() + Vector(0,0,100))
-                    hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
-                        if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
-                    end )
-
-                    gun:Spawn()
-                    
-                end
-                net.Start("vectordealer_CloseFrame")
-                net.Send(ply)
-            end
-        end
-end)
 
 
 
@@ -201,6 +158,8 @@ function grabPosAngle()
     local model = sql.QueryValue("SELECT Model FROM VDSetModel;")
     return posang
 end
+
+
 
 
 
@@ -249,6 +208,10 @@ function getVDInventory()
     net.Send(player.GetAll()[1])
 end
 
+
+
+
+
 --updates tables ^^^^^^^^^^^^^^^^^^^^^^
 --this shit is explained in cl_init.lua its a copy paste lol
 function appendToInv(guns)
@@ -294,6 +257,8 @@ function appendToInv(guns)
 end
 
 
+
+
 function indexof(values,item)
     local index = {}
     for k,v in pairs(values) do
@@ -301,3 +266,47 @@ function indexof(values,item)
     end
     return index[item]
 end
+
+
+
+
+
+net.Receive("vectordealer_BuyWeapon", function( len, ply)    
+    if not ply:IsPlayer() then return end
+    local buylist = net.ReadTable()
+    local currentprice = 0
+    local index = ""
+    local price = 0
+    --OKAY SO BASICALLY THIS WHOLE THING IS LIKE REALLY NEAT SO WHAT THIS DOES IS RECIEVES THE SHOPPING CART TABLE AND THEN FINDS THE INDEX OF THE SPECIFIC ITEM IN THE
+    --SYSTEM THAT WE HAVE AND THEN CREATES AN ITEM PER ONE AND SUBTRACTS THE MONEY FROM IT AUTOMATICALLY ITS BEAUTIFUL
+    PrintTable(buylist)
+    local currentlybought = {}
+    for k,v in pairs(buylist.cart) do
+        
+        --Variables
+        index = indexof(VDInventory.Items,v)
+        price = VDInventory.Prices[index]
+        currentprice = currentprice + price
+        --Checks to see if sql works
+        
+    end
+    if VD_moneyAmount then
+        --Checks to see if u have a balance
+        if VD_moneyAmount >= currentprice then    
+            VD_ply:setDarkRPVar("money", VD_ply:getDarkRPVar("money") - currentprice)
+            for k,v in pairs(buylist.cart)do
+                --creates the gun to spawn
+                local gun = ents.Create( buylist.cart[k] )
+                gun:SetPos( ply:GetPos() + Vector(0,0,100))
+                hook.Add( "PlayerCanPickupWeapon", "PlayerCanPickupWeapon", function( ply, wep )
+                    if ( ply:HasWeapon( wep:GetClass() ) ) then return false end
+                end )
+
+                gun:Spawn()
+                
+            end
+            net.Start("vectordealer_CloseFrame")
+            net.Send(ply)
+        end
+    end
+end)
