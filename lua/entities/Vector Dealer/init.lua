@@ -16,7 +16,7 @@ VDInventory.Prices = {}
 VDTimer = {3600, 7200, 10800, 14400}
 local VD_ply = ""
 local VD_moneyAmount
-model = sql.QueryValue("SELECT Model FROM VDSetModel;")
+local model = sql.QueryValue("SELECT Model FROM VDSetModel;")
 game.AddParticles( "gmod_effects.pcf" )
 PrecacheParticleSystem( "generic_smoke" )
 
@@ -25,12 +25,15 @@ PrecacheParticleSystem( "generic_smoke" )
 
 
 function ENT:Initialize()
+    
 
-
+    
     getVDInventory()
     self:SetModel( model )
     self:DropToFloor()
-    
+    self:DropToFloor()
+    self:DropToFloor()
+
 
 
     self:CapabilitiesAdd( CAP_ANIMATEDFACE )
@@ -65,18 +68,21 @@ function ENT:Initialize()
 
 
 
-
-    timer.Create("disappear", 1200, 0, function()
+    
+    timer.Create("disappear", 1200, 1, function()
+        RunConsoleCommand( "notificationadd", "The Vector Dealer has left." )
         
-        RunConsoleCommand( "Currency_Notificationadd", "The Vector Dealer has left." )
-        self:Remove()
+        if (self:IsValid()) then
+            self:Remove()
+        end  
 
-        timer.Create("respawn", VDTimer[ #VDTimer ], 1, function()
-            
+        timer.Create("respawn", table.Random(VDTimer) , 1, function()
+        
             RunConsoleCommand("VDInitialize")
 
         end)
     end)
+
 end
 
 --ulx.fancyLogAdmin( calling_ply, "#A gave #T $#i", target_ply, amount )
@@ -222,7 +228,7 @@ function getVDInventory()
     --sends so we can interact w/ the menu
     net.Start("vectordealer_TableSend")
     net.WriteTable(guns)
-    net.Send(player.GetAll()[1])
+    net.Send(player.GetAll())
 end
 
 

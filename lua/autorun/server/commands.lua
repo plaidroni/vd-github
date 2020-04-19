@@ -1,4 +1,7 @@
 
+local vecd
+
+
 ----------------------------------------------------------POS------------------------------------------------
 
 
@@ -248,15 +251,26 @@ local function VDInitialize(player, command, name)
 	--Checks if inputted Model is in the db
 	local randTime = math.Round(math.Rand(0, 14400))
 	if(math.Round(RealTime()))then
-		local vecd = ents.Create("vector dealer")
+		vecd = ents.Create("vector dealer")
 		vecd:Spawn()
-		
 		local randTime = math.Round(math.Rand(0, 14400))
 	end 
 end
 concommand.Add( "VDInitialize", VDInitialize, nil, "", {FCVAR_DONTRECORD} )
 
-		
+--[[---------------------------------------------------------
+   Name:	VDRemove
+   Desc:	Allows admins to remove the Vector Dealer
+-----------------------------------------------------------]]  
+local function VDRemove(ply, command)
+	if( !ply:IsAdmin()) then return end
+	if (vecd:IsValid()) then
+		vecd:Remove()
+	end
+end
+concommand.Add( "VDRemove", VDRemove, nil, "", {FCVAR_DONTRECORD} )
+
+	
 
 
 
@@ -303,7 +317,7 @@ local function VDHelp( player, command)
 	print("Misc:")
 	print("")
 	print("VDInitialize -- Starts the Vector Dealer")
-
+	print("VDRemove -- Remove the Vector Dealer (when the periodic respawning of the vector dealer occurs undo will not work. This command is used to remove the vector dealer... ONLY WORKS IF VECTOR DEALER IS SPAWNED THROUGH VDInitialize)")
 
 end
 concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )

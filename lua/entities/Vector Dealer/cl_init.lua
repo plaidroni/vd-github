@@ -668,8 +668,10 @@ function ENT:Draw()
 end
 
 --opens the menu when pressed on
-net.Receive("vectordealer_UsePanel", function( len, ply )
-    print(ply)
+net.Receive("vectordealer_UsePanel", function( len )
+    
+    ply = net.ReadEntity()
+
     VDPly = ply
     VDMenu.showMenu()
 end)
@@ -738,7 +740,6 @@ net.Receive("vectordealer_TableSend", function()
     VDInventory.numberOfItems = #VDInventory.Items
     VDInventory.CurName = VDInventory.Names[1]
     VDInventory.CurPrice = VDInventory.Prices[1]
-    
 
 end)
 
