@@ -80,8 +80,8 @@ function tables_exist()
     elseif (!sql.TableExists("VDPos")) then
         query = "CREATE TABLE VDPos ( Positions TEXT, Angles TEXT, Name TEXT, Map TEXT)"
         result = sql.Query(query)
-        --print(result)
- 
+        str = "0,0,0"
+        sql.Query("INSERT INTO VDPos(Positions, Angles, Name, Map) Values(''"..str.."','"..str.."', DEFAULT,'"..game.GetMap().."');")
         if (sql.TableExists("VDPos")) then
             Msg("Success! table created \n")
         else
@@ -167,3 +167,4 @@ end
 ------------------------Hooks--------------------------------------------------
  
 hook.Add( "Initialize", "Initialize", Initialize)
+

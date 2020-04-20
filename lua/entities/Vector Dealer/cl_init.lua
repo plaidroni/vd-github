@@ -518,16 +518,16 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
 
 ------------------------------EXIT BUTTON--------------------------------------------------------
     VDMenu.ExitButton = vgui.Create("DButton", VDMenu.Frame)
-    VDMenu.ExitButton:SetPos(ScrW() - (scrw9 * .2), scrh16)
-    VDMenu.ExitButton:SetSize(scrw9, scrh16)
+    VDMenu.ExitButton:SetPos(ScrW() - scrw9, scrh16, 1, .5)
+    VDMenu.ExitButton:SetSize(scrw9 * .3, scrw9 * .3)
     VDMenu.ExitButton:MakePopup()
     VDMenu.ExitButton:SetText("")
     function VDMenu.ExitButton:Paint(w, h)
         surface.SetDrawColor( 255, 255, 255, 255)
-        surface.DrawLine(w * .10,0,w * .10,h)
+        surface.DrawLine(0,0,h,h)
+        surface.DrawLine(h,0,0,h)
         --surface.DrawLine(w * .11,w*.6,)
     end
-    VDMenu.ExitButton:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
     function VDMenu.ExitButton.DoClick()
         VDMenu.Frame:Close()
     end

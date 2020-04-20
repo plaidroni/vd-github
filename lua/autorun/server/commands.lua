@@ -65,8 +65,12 @@ local function VDViewPos( player, command)
 	--returns all positions into a table
 	res = sql.Query("SELECT row_number() OVER (ORDER BY Map) row_number,Name,Map FROM VDPos;")
 	if res then 
+		for k,v in pairs(res) do
+			for gk,gv in pairs(v) do
+		    	player:PrintMessage(HUD_PRINTCONSOLE,gv)
+			end
+		end
 		--player:PrintMessages to console
-		player:PrintMessageTable(res)
 	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
 end
 concommand.Add( "VDViewPos", VDViewPos, nil, "", {FCVAR_DONTRECORD} )
@@ -127,7 +131,11 @@ local function VDViewModel(player, command)
 	player:PrintMessage(HUD_PRINTCONSOLE,"		Set Name  = "..curName)
 	player:PrintMessage(HUD_PRINTCONSOLE,"		Set Model = "..curMod)
 	res = sql.Query("SELECT Name, Model from VDModel;")
-	player:PrintMessageTable(res)		
+	for k,v in pairs(res) do
+		for gk,gv in pairs(v) do
+	    	player:PrintMessage(HUD_PRINTCONSOLE,gv)
+		end
+	end	
 end
 concommand.Add( "VDViewModel", VDViewModel, nil, "", {FCVAR_DONTRECORD} )
 
@@ -247,14 +255,15 @@ concommand.Add( "VDDeleteWep", VDDeleteWep, nil, "", {FCVAR_DONTRECORD} )
    Desc:	Allows admins to initialize the Vector Dealer
 -----------------------------------------------------------]]  
 local function VDInitialize(player, command, name)
-	if( !player:IsAdmin()) then return end
-	--Checks if inputted Model is in the db
-	local randTime = math.Round(math.Rand(0, 14400))
-	if(math.Round(RealTime()))then
-		vecd = ents.Create("vector dealer")
-		vecd:Spawn()
+	if( !SERVER ) then if(!player:IsAdmin())then return end else 
+		--Checks if inputted Model is in the db
 		local randTime = math.Round(math.Rand(0, 14400))
-	end 
+		if(math.Round(RealTime()))then
+			vecd = ents.Create("vector dealer")
+			vecd:Spawn()
+			local randTime = math.Round(math.Rand(0, 14400))
+		end 
+	end
 end
 concommand.Add( "VDInitialize", VDInitialize, nil, "", {FCVAR_DONTRECORD} )
 
@@ -264,9 +273,10 @@ concommand.Add( "VDInitialize", VDInitialize, nil, "", {FCVAR_DONTRECORD} )
    Desc:	Allows admins to remove the Vector Dealer
 -----------------------------------------------------------]]  
 local function VDRemove(player, command)
-	if( !player:IsAdmin()) then return end
-	if (vecd:IsValid()) then
-		vecd:Remove()
+	if( !SERVER ) then if(!player:IsAdmin())then return end else 
+		if (vecd:IsValid()) then
+			vecd:Remove()
+		end
 	end
 end
 concommand.Add( "VDRemove", VDRemove, nil, "", {FCVAR_DONTRECORD} )
@@ -288,13 +298,21 @@ local function VDViewInterval( player, command)
 	res = sql.Query("SELECT DespawnInterval FROM VDDespawnInterval;")
 
 	if res then
-		PrintTable(res)
+		for k,v in pairs(res) do
+			for gk,gv in pairs(v) do
+		    	player:PrintMessage(HUD_PRINTCONSOLE,gv)
+			end
+		end
 	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
 	
 	res =  sql.Query("SELECT * FROM VDSpawnInterval")
 
 	if res then
-		PrintTable(res)
+		for k,v in pairs(res) do
+			for gk,gv in pairs(v) do
+		    	player:PrintMessage(HUD_PRINTCONSOLE,gv)
+			end
+		end
 	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
 
 
@@ -396,8 +414,12 @@ local function VDHelp( player, command)
 	player:PrintMessage(HUD_PRINTCONSOLE," ")
 	player:PrintMessage(HUD_PRINTCONSOLE,"Misc:")	
 	player:PrintMessage(HUD_PRINTCONSOLE," ")
-	player:PrintMessage(HUD_PRINTCONSOLE,"VDInitialize -- Starts the Vector Dealer")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDInitialize -- Starts the Vector Dealer ( AUTO STARTS )")
 	player:PrintMessage(HUD_PRINTCONSOLE,"VDRemove -- Remove the Vector Dealer (when the periodic respawning of the vector dealer occurs undo will not work. This command is used to remove the vector dealer... ONLY WORKS IF VECTOR DEALER IS SPAWNED THROUGH VDInitialize)")
 
 end
 concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )
+hook.Add( "InitPostEntity", "spawnvecdealerafterinitpost", function()
+    VDInitialize()
+    VDRemove()
+end)
