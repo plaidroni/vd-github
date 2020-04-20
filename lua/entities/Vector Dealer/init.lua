@@ -17,6 +17,7 @@ VDTimer = {3600, 7200, 10800, 14400}
 local VD_ply = ""
 local VD_moneyAmount
 local model = sql.QueryValue("SELECT Model FROM VDSetModel;")
+
 game.AddParticles( "gmod_effects.pcf" )
 PrecacheParticleSystem( "generic_smoke" )
 
@@ -26,8 +27,10 @@ PrecacheParticleSystem( "generic_smoke" )
 
 function ENT:Initialize()
     
-
+    local SpawnInterval = sql.Query("SELECT * FROM VDSpawnInterval")
+    local DespawnInterval = sql.QueryValue("SELECT DespawnInterval FROM VDDespawnInterval;")
     
+
     getVDInventory()
     self:SetModel( model )
     self:DropToFloor()
@@ -69,14 +72,14 @@ function ENT:Initialize()
 
 
     
-    timer.Create("disappear", 1200, 1, function()
+    timer.Create("disappear", DespawnInterval , 1, function()
         RunConsoleCommand( "notificationadd", "The Vector Dealer has left." )
         
         if (self:IsValid()) then
             self:Remove()
         end  
 
-        timer.Create("respawn", table.Random(VDTimer) , 1, function()
+        timer.Create("respawn", table.Random(SpawnInterval) , 1, function()
         
             RunConsoleCommand("VDInitialize")
 
@@ -89,7 +92,6 @@ end
 
 
 function ENT:Think()
-    self:SetColor(Color(0,0,0,155))
     self:AddGestureSequence( 351,false )
 end
 
@@ -146,7 +148,7 @@ function grabPosAngle()
     local posang = {}
     local res = sql.QueryValue("SELECT COUNT(*) FROM VDPos WHERE Map = '"..game.GetMap().."';")
     --incase some shit breaks
-    if not res then print(sql.LastError()) return end
+    if not res then Msg(sql.LastError()) return end
     
     --grab random integer from 1 - max row of sql
     local rand = math.random(res)
@@ -362,3 +364,4 @@ function indexof(values,item)
     end
     return index[item]
 end
+

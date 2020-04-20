@@ -8,7 +8,7 @@ function tables_exist()
     elseif (!sql.TableExists("VDMinAmt")) then
         query = "CREATE TABLE VDMinAmt ( Money INTEGER )"
         result = sql.Query(query)
-        print(result)
+        --print(result)
         sql.Query("INSERT INTO VDMinAmt(Money) Values(50000)")
 
 
@@ -22,6 +22,55 @@ function tables_exist()
         end
     end
     -----------------------------MIN AMT--------------------------------
+  
+
+
+    -----------------------------CONFIG--------------------------------
+
+    if (sql.TableExists("VDDespawnInterval")) then
+        Msg("Table already exist!\n")
+    elseif (!sql.TableExists("VDDespawnInterval")) then
+        query = "CREATE TABLE VDDespawnInterval ( DespawnInterval INTEGER )"
+        result = sql.Query(query)
+        --print(result)
+        sql.Query("INSERT INTO VDDespawnInterval(DespawnInterval) Values(1200)")
+
+
+
+
+        if (sql.TableExists("VDDespawnInterval")) then
+            Msg("Success! table created \n")
+
+        else
+            Msg("Something went wrong with the VDDespawnInterval query! \n")
+            Msg( sql.LastError( result ) .. "\n")
+        end
+    end
+
+
+    if (sql.TableExists("VDSpawnInterval")) then
+        Msg("Table already exist!\n")
+    elseif (!sql.TableExists("VDSpawnInterval")) then
+        query = "CREATE TABLE VDSpawnInterval ( SpawnInterval INTEGER)"
+        result = sql.Query(query)
+        --print(result)
+        sql.Query("INSERT INTO VDSpawnInterval(SpawnInterval) Values(3600)")
+        sql.Query("INSERT INTO VDSpawnInterval(SpawnInterval) Values(7200)")
+        sql.Query("INSERT INTO VDSpawnInterval(SpawnInterval) Values(10800)")
+        sql.Query("INSERT INTO VDSpawnInterval(SpawnInterval) Values(14400)")
+
+
+
+
+        if (sql.TableExists("VDSpawnInterval")) then
+            Msg("Success! table created \n")
+
+        else
+            Msg("Something went wrong with the VDSpawnInterval query! \n")
+            Msg( sql.LastError( result ) .. "\n")
+        end
+    end
+    -----------------------------CONFIG--------------------------------
 
 
 -------------------------------POS-----------------------------------
@@ -31,7 +80,7 @@ function tables_exist()
     elseif (!sql.TableExists("VDPos")) then
         query = "CREATE TABLE VDPos ( Positions TEXT, Angles TEXT, Name TEXT, Map TEXT)"
         result = sql.Query(query)
-        print(result)
+        --print(result)
  
         if (sql.TableExists("VDPos")) then
             Msg("Success! table created \n")
@@ -52,7 +101,7 @@ function tables_exist()
     elseif (!sql.TableExists("VDModel")) then
         query = "CREATE TABLE VDModel ( Model TEXT, Name TEXT)"
         result = sql.Query(query)
-        print(result)
+        --print(result)
  
         if (sql.TableExists("VDModel")) then
             Msg("Success! table created \n")
@@ -69,7 +118,7 @@ function tables_exist()
         query = "CREATE TABLE VDSetModel ( Model TEXT, Name TEXT)"
         result = sql.Query(query)
         sql.Query("INSERT INTO VDSetModel(Model, Name) VALUES('models/vector_orc.mdl', 'Vector');")
-        print(result)
+        --print(result)
  
         if (sql.TableExists("VDSetModel")) then
             Msg("Success! table created \n")
@@ -96,7 +145,7 @@ function tables_exist()
         sql.Query("INSERT INTO VDInventory(name,gun,model,price) VALUES('Crowbar','weapon_crowbar','models/weapons/w_crowbar.mdl',50);")
         sql.Query("INSERT INTO VDInventory(name,gun,model,price) VALUES('Frag Grenade','weapon_frag','models/weapons/w_eq_fraggrenade.mdl',50);")
 
-        print(result)
+        --print(result)
  
         if (sql.TableExists("VDInventory")) then
             Msg("Success! table created \n")

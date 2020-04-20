@@ -26,8 +26,8 @@ local function VDSetPos( player, command, name)
 	if not result then
 		--inputs pos, look angle, name, and map into sql table
 		query = sql.Query("INSERT INTO VDPos(Positions,Angles,Name,Map) VALUES( '".. pos .."','"..look.."','"..name[1].."','"..game.GetMap().."');")
-		if not query then print(sql.LastError())end
-	else print("Position already logged under that name!")
+		if not query then player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError())end
+	else player:PrintMessage(HUD_PRINTCONSOLE,"Position already logged under that name!")
 	end
 
 end
@@ -47,9 +47,9 @@ local function VDDeletePos( player, command, name)
 		--Deletes selected name
 		query = sql.Query("DELETE FROM VDPos WHERE Name = '".. name[1] .."' AND Map = '"..game.GetMap().."';")
 		if query then
-			print(name[1].. " sucessfully deleted!")
+			player:PrintMessage(HUD_PRINTCONSOLE,name[1].. " sucessfully deleted!")
 		end
-	else print("No such name exists!")
+	else player:PrintMessage(HUD_PRINTCONSOLE,"No such name exists!")
 	end
 end
 
@@ -65,9 +65,9 @@ local function VDViewPos( player, command)
 	--returns all positions into a table
 	res = sql.Query("SELECT row_number() OVER (ORDER BY Map) row_number,Name,Map FROM VDPos;")
 	if res then 
-		--prints to console
-		PrintTable(res)
-	else print(sql.LastError()) end
+		--player:PrintMessages to console
+		player:PrintMessageTable(res)
+	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
 end
 concommand.Add( "VDViewPos", VDViewPos, nil, "", {FCVAR_DONTRECORD} )
 
@@ -96,8 +96,8 @@ concommand.Add( "VDClearPos", VDClearPos, nil, "", {FCVAR_DONTRECORD} )
 local function VDAddModel(player, command, model)
 	if( !player:IsAdmin()) then return end
 	query = sql.Query("INSERT INTO VDModel(Model, Name) VALUES('"..model[1].."', '"..model[2].."');")
-	if not query then print(sql.LastError())
-	else print("Success!")
+	if not query then player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError())
+	else player:PrintMessage(HUD_PRINTCONSOLE,"Success!")
 	end		
 end
 concommand.Add("VDAddModel", VDAddModel, nil, "", {FCVAR_DONTRECORD})
@@ -124,10 +124,10 @@ local function VDViewModel(player, command)
 	if( !player:IsAdmin()) then return end
 	curMod = sql.QueryValue("SELECT Model FROM VDSetModel;")
 	curName = sql.QueryValue("SELECT Name FROM VDSetModel;")
-	print("		Set Name  = "..curName)
-	print("		Set Model = "..curMod)
+	player:PrintMessage(HUD_PRINTCONSOLE,"		Set Name  = "..curName)
+	player:PrintMessage(HUD_PRINTCONSOLE,"		Set Model = "..curMod)
 	res = sql.Query("SELECT Name, Model from VDModel;")
-	PrintTable(res)		
+	player:PrintMessageTable(res)		
 end
 concommand.Add( "VDViewModel", VDViewModel, nil, "", {FCVAR_DONTRECORD} )
 
@@ -159,9 +159,9 @@ local function VDDeleteModel(player, command, name)
 		--Deletes selected name
 		query = sql.Query("DELETE FROM VDModel WHERE Name = '".. name[1] .."';")
 		if query then
-			print(name[1].. " sucessfully deleted!")
+			player:PrintMessage(HUD_PRINTCONSOLE,name[1].. " sucessfully deleted!")
 		end
-	else print("No such model exists!")
+	else player:PrintMessage(HUD_PRINTCONSOLE,"No such model exists!")
 	end	
 end
 concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
@@ -182,8 +182,8 @@ concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
 local function VDAddWep(player, command, model)
 	if( !player:IsAdmin()) then return end
 	query = sql.Query("INSERT INTO VDInventory(name,model,gun,price) VALUES('"..model[1].."', '"..model[2].."', '"..model[3].."','"..model[4].."');")
-	if not query then print(sql.LastError())
-	else print("Success!")
+	if not query then player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError())
+	else player:PrintMessage(HUD_PRINTCONSOLE,"Success!")
 	end		
 end
 concommand.Add("VDAddWep", VDAddWep, nil, "", {FCVAR_DONTRECORD})
@@ -199,9 +199,9 @@ local function VDViewWep( player, command)
 	--returns all positions into a table
 	res = sql.Query("SELECT row_number() OVER (ORDER BY gun) row_number,gun,model FROM VDInventory;")
 	if res then 
-		--prints to console
+		--player:PrintMessages to console
 		PrintTable(res)
-	else print(sql.LastError()) end
+	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
 end
 concommand.Add( "VDViewWep", VDViewWep, nil, "", {FCVAR_DONTRECORD} )
 
@@ -228,9 +228,9 @@ local function VDDeleteWep(player, command, name)
 		--Deletes selected name
 		query = sql.Query("DELETE FROM VDInventory WHERE Name = '".. name[1] .."';")
 		if query then
-			print(name[1].. " sucessfully deleted!")
+			player:PrintMessage(HUD_PRINTCONSOLE,name[1].. " sucessfully deleted!")
 		end
-	else print("No such model exists!")
+	else player:PrintMessage(HUD_PRINTCONSOLE,"No such model exists!")
 	end	
 end
 concommand.Add( "VDDeleteWep", VDDeleteWep, nil, "", {FCVAR_DONTRECORD} )
@@ -258,19 +258,86 @@ local function VDInitialize(player, command, name)
 end
 concommand.Add( "VDInitialize", VDInitialize, nil, "", {FCVAR_DONTRECORD} )
 
+
 --[[---------------------------------------------------------
    Name:	VDRemove
    Desc:	Allows admins to remove the Vector Dealer
 -----------------------------------------------------------]]  
-local function VDRemove(ply, command)
-	if( !ply:IsAdmin()) then return end
+local function VDRemove(player, command)
+	if( !player:IsAdmin()) then return end
 	if (vecd:IsValid()) then
 		vecd:Remove()
 	end
 end
 concommand.Add( "VDRemove", VDRemove, nil, "", {FCVAR_DONTRECORD} )
 
+
+
+
+--[[---------------------------------------------------------
+   Name:	VDViewInterval
+   Desc:	Allows admins to change see Spawn and Depawn Interval
+-----------------------------------------------------------]]  
+
+
+local function VDViewInterval( player, command)
+	if ( !player:IsAdmin() ) then return end
+	--returns all intervals into a table
+
+
+	res = sql.Query("SELECT DespawnInterval FROM VDDespawnInterval;")
+
+	if res then
+		PrintTable(res)
+	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
 	
+	res =  sql.Query("SELECT * FROM VDSpawnInterval")
+
+	if res then
+		PrintTable(res)
+	else player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError()) end
+
+
+
+
+end
+concommand.Add( "VDViewInterval", VDViewInterval, nil, "", {FCVAR_DONTRECORD} )
+concommand.Add( "VDViewInterval", VDViewInterval, nil, "", {FCVAR_DONTRECORD} )
+
+
+--[[---------------------------------------------------------
+   Name:	VDChangeSpawnInterval
+   Desc:	Allows admins to change the interval for how long the VD is active
+-----------------------------------------------------------]]  
+local function VDChangeSpawnInterval(player, command, num)
+	if( !player:IsAdmin()) then return end
+	
+
+	sql.Query("DELETE FROM VDSpawnInterval;")	
+
+
+	for k,v in pairs(num) do
+		sql.Query("INSERT INTO VDSpawnInterval(SpawnInterval) VALUES('"..v.."');")
+	end
+
+end
+concommand.Add( "VDChangeSpawnInterval", VDChangeSpawnInterval, nil, "", {FCVAR_DONTRECORD} )
+
+
+
+--[[---------------------------------------------------------
+   Name:	VDChangeDespawnInterval
+   Desc:	Allows admins to change the interval for how long the VD is active
+-----------------------------------------------------------]]  
+local function VDChangeDespawnInterval(player, command, num)
+	if( !player:IsAdmin()) then return end
+		
+	res = sql.QueryValue("UPDATE VDDespawnInterval SET DespawnInterval = '"..num[1].."';")
+
+end
+concommand.Add( "VDChangeDespawnInterval", VDChangeDespawnInterval, nil, "", {FCVAR_DONTRECORD} )
+
+
 
 
 
@@ -279,45 +346,58 @@ concommand.Add( "VDRemove", VDRemove, nil, "", {FCVAR_DONTRECORD} )
    Desc:	Help
 -----------------------------------------------------------]]  
 local function VDHelp( player, command)
+	if( !player:IsAdmin() ) then return end
 	--Pos
-	print("")
-	print("")
-
-	print("")
-	print("")
-	print("Position:")
-	print("")
-	print("VDSetPos String Name -- Sets the position of the Vector Dealer with look angle and position")
-	print("VDDeletePos String Name -- Deletes a specific position of the Vector Dealer")
-	print("VDViewPos -- Displays a table of all positions according to map and name")
-	print("VDClearPos -- Clears all of the positions in the table")
+	
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"Position:")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDSetPos String Name -- Sets the position of the Vector Dealer with look angle and position")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDDeletePos String Name -- Deletes a specific position of the Vector Dealer")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDViewPos -- Displays a table of all positions according to map and name")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDClearPos -- Clears all of the positions in the table")
 	--Model
-	print("")
-	print("")
-	print("Model:")
-	print("")
-	print("VDAddModel String Path, String Name -- (format as 'models/MODEL.mdl') allows the admin to add a model")
-	print("VDViewModel String Name -- displays all of the models in the DB")
-	print("VDSetModel String Name -- sets the current model in accordance to the name")
-	print("VDClearModel -- Deletes all models from the database")
-	print("VDDeleteModel String Name -- Deletes model with specified name")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"Model:")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDAddModel String Path, String Name -- (format as 'models/MODEL.mdl') allows the admin to add a model")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDViewModel String Name -- displays all of the models in the DB")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDSetModel String Name -- sets the current model in accordance to the name")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDClearModel -- Deletes all models from the database")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDDeleteModel String Name -- Deletes model with specified name")
 	--Gun
-	print("")
-	print("")
-	print("Gun:")
-	print("")
-	print("VDAddWep String name, String model, String entity, Integer cost -- (EX: VDAddWep Famas models/weapons/w_tct_famas.mdl m9k_famas 15000) allows admins to add a weapon to the VDShop")
-	print("VDViewWep -- Displays all guns in the shop")
-	print("VDClearWep -- Deletes all guns from the database")
-	print("VDDeleteWep String gun -- (EX: VDDeleteWep 'm9k_famas') Deletes the gun with specified name")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"Gun:")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDAddWep String name, String model, String entity, Integer cost -- (EX: VDAddWep Famas models/weapons/w_tct_famas.mdl m9k_famas 15000) allows admins to add a weapon to the VDShop")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDViewWep -- Displays all guns in the shop")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDClearWep -- Deletes all guns from the database")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDDeleteWep String gun -- (EX: VDDeleteWep 'm9k_famas') Deletes the gun with specified name")
+
+
+	--SpawnInterval
+
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"Spawn and Despawn Intervals:")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDChangeSpawnInterval Int num -- Allows admins to change the interval for how long the VD is dormant (can support any amount of numbers.. just separate by spaces ex. VDChangeSpawnInterval 1 2 3 4")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDChangeDespawnInterval Int num -- Allows admins to change the interval for how long the VD is active")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDViewInterval -- Shows all Spawn and Despawn Intervals")
+
+
+
 
 	--misc
-	print("")
-	print("")
-	print("Misc:")
-	print("")
-	print("VDInitialize -- Starts the Vector Dealer")
-	print("VDRemove -- Remove the Vector Dealer (when the periodic respawning of the vector dealer occurs undo will not work. This command is used to remove the vector dealer... ONLY WORKS IF VECTOR DEALER IS SPAWNED THROUGH VDInitialize)")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"Misc:")	
+	player:PrintMessage(HUD_PRINTCONSOLE," ")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDInitialize -- Starts the Vector Dealer")
+	player:PrintMessage(HUD_PRINTCONSOLE,"VDRemove -- Remove the Vector Dealer (when the periodic respawning of the vector dealer occurs undo will not work. This command is used to remove the vector dealer... ONLY WORKS IF VECTOR DEALER IS SPAWNED THROUGH VDInitialize)")
 
 end
 concommand.Add( "VDHelp", VDHelp, nil, "", {FCVAR_DONTRECORD} )
