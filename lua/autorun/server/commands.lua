@@ -438,7 +438,7 @@ local function VDHelp( player, command)
 	--Gun
 	player:PrintMessage(HUD_PRINTCONSOLE," ")
 	player:PrintMessage(HUD_PRINTCONSOLE," ")
-	player:PrintMessage(HUD_PRINTCONSOLE,"Gun:")
+	player:PrintMessage(HUD_PRINTCONSOLE,"Inventory:")
 	player:PrintMessage(HUD_PRINTCONSOLE," ")
 	player:PrintMessage(HUD_PRINTCONSOLE,"VDAddWep String name, String model, String entity, Integer cost -- (EX: VDAddWep Famas models/weapons/w_tct_famas.mdl m9k_famas 15000) allows admins to add a weapon to the VDShop")
 	player:PrintMessage(HUD_PRINTCONSOLE,"VDViewWep -- Displays all guns in the shop")

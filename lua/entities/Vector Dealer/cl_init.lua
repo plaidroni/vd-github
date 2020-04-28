@@ -458,8 +458,6 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     VDMenu.iconPM = vgui.Create( "DModelPanel", VDMenu.PurchaseMenu )
     VDMenu.iconPM:SetMouseInputEnabled( true )
     VDMenu.iconPM:SetSize( ScrH()/9, ScrW()/16)
-
-    --VDMenu.PurchaseMenu:MoveTo(ScrW() - scrw9, scrh16, 1, .5)
     function VDMenu.PurchaseMenu:Paint(w,h)
         surface.SetDrawColor( Color( 255, 255, 255, 255 ) )
         lerppos = Lerp( 3 * FrameTime(), lerppos, .87 )
@@ -506,16 +504,11 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     VDMenu.ButtonPurchaseMenu.DoClick = function()
         
         table.insert(VDInventory.Buylist.cart, VDInventory.Items[iconIndex])
-      
-     -- updateList(VDInventory.Items[i], i)
         table.insert(VDInventory.Buylist.index, iconIndex)
         UpdateCart(VDInventory.Buylist.cart,iconIndex)
         updateShoppingCartModel(item)
     end
         
-
-
-
 ------------------------------EXIT BUTTON--------------------------------------------------------
     VDMenu.ExitButton = vgui.Create("DButton", VDMenu.Frame)
     VDMenu.ExitButton:SetPos(ScrW() - scrw9, scrh16, 1, .5)
@@ -549,13 +542,13 @@ end
 
 function UpdateCart(tbl,index)
     subtotal = Subtotal(tbl)
-    hashmap = updateCartInPanel(VDInventory.Items[index])
+    local hashmap = updateCartInPanel(VDInventory.Items[index])
 end
 
 --calculates the subtotal of the current shopping cart
 
 function Subtotal()
-    subtotal = 0
+    local subtotal = 0
     for k,v in pairs(VDInventory.Buylist.cart) do
         index = indexof(VDInventory.Items,v)
         price = VDInventory.Prices[index]
@@ -673,6 +666,7 @@ net.Receive("vectordealer_UsePanel", function( len )
     ply = net.ReadEntity()
 
     VDPly = ply
+    
     VDMenu.showMenu()
 end)
 
