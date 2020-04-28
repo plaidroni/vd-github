@@ -22,8 +22,12 @@ local function VDSetPos( player, command, name)
 	local look = x.." "..y.." "..z
 
 	--Checks if current map + name is already in the system
-	local n = sql.SQLStr(name[1])
+	
+	local n = sql.SQLStr(name[1],true)
+	print(n)
+	
 	local result = sql.Query("SELECT Name FROM VDPos WHERE Map = '"..game.GetMap().."' AND Name = '".. n .."';")
+
 	if not result then
 		--inputs pos, look angle, name, and map into sql table
 
@@ -47,7 +51,7 @@ concommand.Add( "VDSetPos", VDSetPos, nil, "", { FCVAR_DONTRECORD } )
 local function VDDeletePos( player, command, name)
 	if ( !player:IsAdmin() ) then return end
 	--Checks if inputted name and map is in the db
-	local n = sql.SQLStr(name[1])
+	local n = sql.SQLStr(name[1],true)
 	local result = sql.Query("SELECT Name FROM VDPos WHERE Name = '".. n .."' AND Map = '"..game.GetMap().."';")
 	if result then
 		--Deletes selected name
@@ -110,8 +114,8 @@ concommand.Add( "VDClearPos", VDClearPos, nil, "", {FCVAR_DONTRECORD} )
 local function VDAddModel(player, command, model)
 	if( !player:IsAdmin()) then return end
 	
-	local m1 = sql.SQLStr(model[1])
-	local m2 = sql.SQLStr(model[2])
+	local m1 = sql.SQLStr(model[1],true)
+	local m2 = sql.SQLStr(model[2],true)
 
 	local query = sql.Query("INSERT INTO VDModel(Model, Name) VALUES('"..m1.."', '"..m2.."');")
 	
@@ -133,7 +137,7 @@ concommand.Add("VDAddModel", VDAddModel, nil, "", {FCVAR_DONTRECORD})
 local function VDSetModel( player, command, model)
 	if( !player:IsAdmin()) then return end
 
-	local m = sql.SQLStr(model[1])
+	local m = sql.SQLStr(model[1],true)
 	
 	sql.QueryValue("UPDATE VDModel SET Model = '"..m.."' WHERE Name = '"..m.."';")
 	
@@ -188,7 +192,7 @@ local function VDDeleteModel(player, command, name)
 	if( !player:IsAdmin()) then return end
 	--Checks if inputted Model is in the db
 	
-	local n = sql.SQLStr(name[1])
+	local n = sql.SQLStr(name[1],true)
 
 	local result = sql.Query("SELECT Name FROM VDModel WHERE Name = '".. n .."';")
 	
@@ -222,10 +226,10 @@ concommand.Add( "VDDeleteModel", VDDeleteModel, nil, "", {FCVAR_DONTRECORD} )
 local function VDAddWep(player, command, model)
 	if( !player:IsAdmin()) then return end
 	
-	local m1 = sql.SQLStr(model[1]) 
-	local m2 = sql.SQLStr(model[2]) 
-	local m3 = sql.SQLStr(model[3]) 
-	local m4 = sql.SQLStr(model[4]) 
+	local m1 = sql.SQLStr(model[1],true) 
+	local m2 = sql.SQLStr(model[2],true) 
+	local m3 = sql.SQLStr(model[3],true) 
+	local m4 = sql.SQLStr(model[4],true) 
 	local query = sql.Query("INSERT INTO VDInventory(name,model,gun,price) VALUES('"..m1.."', '"..m2.."', '"..m3.."','"..m4.."');")
 	
 	if not query then 
@@ -272,7 +276,7 @@ local function VDDeleteWep(player, command, name)
 	if( !player:IsAdmin()) then return end
 	--Checks if inputted Model is in the db
 	
-	local n = sql.SQLStr(name[1])
+	local n = sql.SQLStr(name[1],true)
 
 	local result = sql.Query("SELECT gun FROM VDInventory WHERE Name = '".. n .."';")
 	if result then
@@ -398,7 +402,7 @@ concommand.Add( "VDChangeSpawnInterval", VDChangeSpawnInterval, nil, "", {FCVAR_
 local function VDChangeDespawnInterval(player, command, num)
 	if( !player:IsAdmin()) then return end
 	
-	local n = sql.SQLStr(num[1])
+	local n = sql.SQLStr(num[1],true)
 
 	sql.QueryValue("UPDATE VDDespawnInterval SET DespawnInterval = '"..n.."';")
 

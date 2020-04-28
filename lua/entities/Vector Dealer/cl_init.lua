@@ -664,7 +664,6 @@ end
 net.Receive("vectordealer_UsePanel", function( len )
     
     ply = net.ReadEntity()
-
     VDPly = ply
     
     VDMenu.showMenu()

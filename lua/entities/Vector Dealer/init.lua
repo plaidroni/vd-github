@@ -76,37 +76,42 @@ function ENT:Think()
     self:AddGestureSequence( 351,false )
 end
 
+
+
 function ENT:Use( Name )
+
+
     if Name:IsPlayer() then
         VD_moneyAmount = Name:getDarkRPVar("money")
         local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
         local x,y,z  = Name:GetPos():Unpack()
         local z = z + 60
-        Name:Freeze(true)
+        
+       -- Name:Freeze(true)
 
         ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
         ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
       
-        Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
+        --Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
        
         if VD_moneyAmount > minamt then
-            timer.Create("creationOfPanel", 3, 1, function()
-                net.Start("vectordealer_UsePanel")
-                
-                net.WriteEntity(Name)
-                Name:Freeze(false)
-                net.Send(Name)
-                end)
-
-        else
+            sendName(Name)
+        --[[else
             timer.Create("fadein", 3, 1, function()
                 Name:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0.2)
-                Name:Freeze(false)
-            end)
+                --Name:Freeze(false)
+            end)]]
         end
 
     end
+    timer.Create('lockout',3,1,function()end)
+
+
 end
+
+
+
+
 
 function grabPosAngle()
     local posang = {}
@@ -137,6 +142,8 @@ function grabPosAngle()
     local model = sql.QueryValue("SELECT Model FROM VDSetModel;")
     return posang
 end
+
+
 
 function getVDInventory()
     local randtbl = {}
@@ -245,6 +252,8 @@ net.Receive("vectordealer_BuyWeapon", function( len, ply)
     end
 end)
 
+
+
 function indexof(values,item)
     local index = {}
     for k,v in pairs(values) do
@@ -253,3 +262,13 @@ function indexof(values,item)
     return index[item]
 end
 
+
+function sendName(Name)
+    --timer.Create("creationOfPanel", 3, 1, function()      
+        net.Start("vectordealer_UsePanel")
+        
+        net.WriteEntity(Name)
+
+        net.Send(Name)
+   -- end)
+end
