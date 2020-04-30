@@ -93,44 +93,6 @@ function tables_exist()
 
 
 
-------------------------MODEL-------------------------------------
-
-
-    if (sql.TableExists("VDModel")) then
-        Msg("Table already exist!\n")
-    elseif (!sql.TableExists("VDModel")) then
-        query = "CREATE TABLE VDModel ( Model TEXT, Name TEXT)"
-        result = sql.Query(query)
-        --print(result)
- 
-        if (sql.TableExists("VDModel")) then
-            Msg("Success! table created \n")
-        else
-            Msg("Something went wrong with the VDModel query! \n")
-            Msg( sql.LastError( result ) .. "\n")
-        end
-    end
-
-
-    if (sql.TableExists("VDSetModel")) then
-        Msg("Table already exist!\n")
-    elseif (!sql.TableExists("VDSetModel")) then
-        query = "CREATE TABLE VDSetModel ( Model TEXT, Name TEXT)"
-        result = sql.Query(query)
-        sql.Query("INSERT INTO VDSetModel(Model, Name) VALUES('models/vector_orc.mdl', 'Vector');")
-        --print(result)
- 
-        if (sql.TableExists("VDSetModel")) then
-            Msg("Success! table created \n")
-        else
-            Msg("Something went wrong with the VDSetModel query! \n")
-            Msg( sql.LastError( result ) .. "\n")
-        end
-    end
-    ------------------------MODEL-------------------------------------
-
-
-
     ----------------------INVENTORY-----------------------------------------------------
 
     if (sql.TableExists("VDInventory")) then

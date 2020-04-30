@@ -662,11 +662,22 @@ end
 
 --opens the menu when pressed on
 net.Receive("vectordealer_UsePanel", function( len )
+
+
+
+    local VDPly = net.ReadEntity()
+    --to reset fov
+    local prevFOV = VDPly:GetFOV()
+    VDPly:SetFOV(prevFOV+70,1)
+    VDPly:ScreenFade( SCREENFADE.OUT, color_black, .75, 5 )
+    timer.Simple(1, function()   
+        VDPly:SetFOV(0,1) 
+        VDMenu.showMenu()
+        VDPly:ScreenFade( SCREENFADE.IN, color_black, 1.3,0 )
+    end)
+
     
-    ply = net.ReadEntity()
-    VDPly = ply
     
-    VDMenu.showMenu()
 end)
 
 ---------INITIALIZATION------------------------------
@@ -740,3 +751,33 @@ end)
 
 
 
+
+
+
+ function zoomOnClick(ply, pos, angles, fov )
+
+    local view = {}
+    view.origin = pos
+    view.angles = angles
+
+    view.fov = fov * -20
+    
+    
+    return view
+    
+end 
+--[[
+hook.Add("CalcView", "urmom", 
+    function(ply, pos, angles, fov )
+
+        local view = {}
+        view.origin = pos
+        view.angles = angles
+
+        view.fov = fov * -20
+        
+        
+        return view
+    
+    end 
+)]]

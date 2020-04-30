@@ -23,6 +23,7 @@ VDTimer.Times = {3600, 7200, 10800, 14400}
 local VD_ply = ""
 local VD_moneyAmount
 local model = sql.QueryValue("SELECT Model FROM VDSetModel;")
+local inUse = false
 
 game.AddParticles( "gmod_effects.pcf" )
 PrecacheParticleSystem( "generic_smoke" )
@@ -79,34 +80,29 @@ end
 
 
 function ENT:Use( Name )
+        if Name:IsPlayer() then
+            VD_moneyAmount = Name:getDarkRPVar("money")
+            local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
+            local x,y,z  = Name:GetPos():Unpack()
+            local z = z + 60
+            
+            ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+            ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
+                     
+            if VD_moneyAmount > minamt then
+                if not inUse then
+                    inUse = true
 
+                    Name:Freeze(false)
+                    --PUT ANIMATION HERE
+                    sendName(Name)
 
-    if Name:IsPlayer() then
-        VD_moneyAmount = Name:getDarkRPVar("money")
-        local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
-        local x,y,z  = Name:GetPos():Unpack()
-        local z = z + 60
-        
-       -- Name:Freeze(true)
+                    inUse = false
 
-        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-        ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-      
-        --Name:ScreenFade( SCREENFADE.OUT, Color( 0,0,0,255 ), 3, 0.2 )
-       
-        if VD_moneyAmount > minamt then
-            sendName(Name)
-        --[[else
-            timer.Create("fadein", 3, 1, function()
-                Name:ScreenFade( SCREENFADE.IN, Color( 0,0,0,255 ), 3, 0.2)
-                --Name:Freeze(false)
-            end)]]
-        end
-
+                end
+            
+            end
     end
-    timer.Create('lockout',3,1,function()end)
-
-
 end
 
 
