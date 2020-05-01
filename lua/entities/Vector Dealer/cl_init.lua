@@ -698,7 +698,6 @@ net.Receive("vectordealer_TableSend", function()
     
     --grabs the inventory
     guns=net.ReadTable()
-    PrintTable(guns)
     num = #guns
 
     --for separating models,item,price
