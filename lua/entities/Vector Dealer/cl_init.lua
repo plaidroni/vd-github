@@ -258,6 +258,8 @@ function VDMenu.showMenu( )
         net.SendToServer()
         clearCart()
         VDMenu.Frame:Close()
+        VDPly:ScreenFade( SCREENFADE.IN, color_black, .5,0 )
+
 
 
 
@@ -523,6 +525,8 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     end
     function VDMenu.ExitButton.DoClick()
         VDMenu.Frame:Close()
+        VDPly:ScreenFade( SCREENFADE.IN, color_black, .5,0 )
+
     end
     function VDMenu.ExitButton:Think()
         VDMenu.ExitButton:MoveToFront()
@@ -665,15 +669,14 @@ net.Receive("vectordealer_UsePanel", function( len )
 
 
 
-    local VDPly = net.ReadEntity()
+    VDPly = net.ReadEntity()
     --to reset fov
     local prevFOV = VDPly:GetFOV()
-    VDPly:SetFOV(prevFOV+70,1)
-    VDPly:ScreenFade( SCREENFADE.OUT, color_black, .75, 5 )
-    timer.Simple(1, function()   
+    VDPly:SetFOV(prevFOV+ 80,2.65)
+    VDPly:ScreenFade( SCREENFADE.OUT, color_black, 1.15, 1 )
+    timer.Simple(1.65, function()   
         VDPly:SetFOV(0,1) 
         VDMenu.showMenu()
-        VDPly:ScreenFade( SCREENFADE.IN, color_black, 1.3,0 )
     end)
 
     
@@ -695,6 +698,7 @@ net.Receive("vectordealer_TableSend", function()
     
     --grabs the inventory
     guns=net.ReadTable()
+    PrintTable(guns)
     num = #guns
 
     --for separating models,item,price
