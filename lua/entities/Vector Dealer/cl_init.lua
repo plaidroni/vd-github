@@ -258,7 +258,7 @@ function VDMenu.showMenu( )
         net.SendToServer()
         clearCart()
         VDMenu.Frame:Close()
-        VDPly:ScreenFade( SCREENFADE.IN, color_black, .5,0 )
+        
 
 
 
@@ -525,7 +525,6 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     end
     function VDMenu.ExitButton.DoClick()
         VDMenu.Frame:Close()
-        VDPly:ScreenFade( SCREENFADE.IN, color_black, .5,0 )
 
     end
     function VDMenu.ExitButton:Think()
