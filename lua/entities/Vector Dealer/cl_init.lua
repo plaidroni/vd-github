@@ -21,12 +21,12 @@ surface.CreateFont("LividityBuy", {
 
 surface.CreateFont("VDBuyMenuText", {
     font = "TargetID",
-    size = ScrW()*.007,
+    size = ScreenScale(4),
     weight = 500
 })
 surface.CreateFont("VDItemText", {
     font = "TargetID",
-    size = ScrW()*.014,
+    size = ScreenScale(8),
     weight = 500
 })
 
@@ -76,10 +76,10 @@ function VDMenu.showMenu( )
     --effects based on clicking on VDealer
    
 
-    x,y,z = LocalPlayer():GetPos():Unpack()
+    local x,y,z = LocalPlayer():GetPos():Unpack()
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
     ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
-    menuOpen = true
+    local menuOpen = true
     
     VDMenu.Frame = vgui.Create("DFrame")
     VDMenu.Frame:SetPos(0,0)
@@ -88,8 +88,8 @@ function VDMenu.showMenu( )
     VDMenu.Frame:SetDraggable(false)
     VDMenu.Frame:SetTitle("")
     VDMenu.Frame:MakePopup()
-    countdown = 100
-    eyecountdown = 20
+    local countdown = 100
+    local eyecountdown = 20
     
 
 
@@ -106,9 +106,10 @@ function VDMenu.showMenu( )
         function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
         eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
         local eyepos = Vector(0, 0, eyecountdown) + VDSit.Entity:GetBonePosition(VDSit.Entity:LookupBone("ValveBiped.Bip01_Head1"))
+        local mx,my = input.GetCursorPos()
         VDSit:SetLookAt(eyepos)
-        VDSit:SetCamPos(eyepos-Vector(-20, 0, 0)) -- Move cam in front of eyes
-        VDSit.Entity:SetEyeTarget(eyepos-Vector(-12, 0, 0))
+        VDSit:SetCamPos(eyepos-Vector(-20, 0, 0) )-- Move cam in front of eyes
+        VDSit.Entity:SetEyeTarget(Vector(0,mx,my))
         VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
 
     ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
@@ -378,6 +379,7 @@ function VDMenu.showMenu( )
         xz,yz = icon:GetSize()
         icon:SetPos(x - xz/4, y - yz/2.25)
         icon:SetModel( VDInventory.Models[i] ) -- you can only change colors on playermodels
+        print( VDInventory.Models[i] )
         local mn, mx = icon.Entity:GetRenderBounds()
         local size = mx.x * 2
         size = math.max( size, math.abs( mn.x ) + math.abs( mx.x ) )
