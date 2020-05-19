@@ -119,12 +119,12 @@ local function VDAddWep(player, command, model)
 	local m3 = sql.SQLStr(model[3],true) 
 	local m4 = sql.SQLStr(model[4],true) 
 	local query = sql.Query("INSERT INTO VDInventory(name,model,gun,price) VALUES('"..m1.."', '"..m2.."', '"..m3.."','"..m4.."');")
-	
+	--[[
 	if not query then 
 		player:PrintMessage(HUD_PRINTCONSOLE,sql.LastError())
 	else 
 		player:PrintMessage(HUD_PRINTCONSOLE,"Success!")
-	end		
+	end	]]	
 end
 concommand.Add("VDAddWep", VDAddWep, nil, "", {FCVAR_DONTRECORD})
 

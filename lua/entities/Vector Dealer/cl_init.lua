@@ -259,6 +259,8 @@ function VDMenu.showMenu( )
         net.SendToServer()
         clearCart()
         VDMenu.Frame:Close()
+        
+
 
 
 
@@ -525,6 +527,7 @@ VDMenu.PurchaseMenu = vgui.Create("DFrame", VDMenu.Frame)
     end
     function VDMenu.ExitButton.DoClick()
         VDMenu.Frame:Close()
+
     end
     function VDMenu.ExitButton:Think()
         VDMenu.ExitButton:MoveToFront()
@@ -667,15 +670,11 @@ net.Receive("vectordealer_UsePanel", function( len )
 
 
 
-    local VDPly = net.ReadEntity()
+    VDPly = net.ReadEntity()
     --to reset fov
-    local prevFOV = VDPly:GetFOV()
-    VDPly:SetFOV(prevFOV+70,1)
-    VDPly:ScreenFade( SCREENFADE.OUT, color_black, .75, 5 )
-    timer.Simple(1, function()   
-        VDPly:SetFOV(0,1) 
+    VDPly:ScreenFade( SCREENFADE.OUT, color_black, 1.15, 1 )
+    timer.Simple(1.65, function()   
         VDMenu.showMenu()
-        VDPly:ScreenFade( SCREENFADE.IN, color_black, 1.3,0 )
     end)
 
     
@@ -756,18 +755,6 @@ end)
 
 
 
- function zoomOnClick(ply, pos, angles, fov )
-
-    local view = {}
-    view.origin = pos
-    view.angles = angles
-
-    view.fov = fov * -20
-    
-    
-    return view
-    
-end 
 --[[
 hook.Add("CalcView", "urmom", 
     function(ply, pos, angles, fov )
