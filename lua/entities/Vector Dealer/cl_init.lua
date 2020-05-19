@@ -670,11 +670,8 @@ net.Receive("vectordealer_UsePanel", function( len )
 
     VDPly = net.ReadEntity()
     --to reset fov
-    local prevFOV = VDPly:GetFOV()
-    VDPly:SetFOV(prevFOV+ 80,2.65)
     VDPly:ScreenFade( SCREENFADE.OUT, color_black, 1.15, 1 )
     timer.Simple(1.65, function()   
-        VDPly:SetFOV(0,1) 
         VDMenu.showMenu()
     end)
 
@@ -756,18 +753,6 @@ end)
 
 
 
- function zoomOnClick(ply, pos, angles, fov )
-
-    local view = {}
-    view.origin = pos
-    view.angles = angles
-
-    view.fov = fov * -20
-    
-    
-    return view
-    
-end 
 --[[
 hook.Add("CalcView", "urmom", 
     function(ply, pos, angles, fov )
