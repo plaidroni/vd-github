@@ -48,7 +48,6 @@ VDInventory.numberOfItems = #VDInventory.Items
 VDInventory.CurName = ""
 VDInventory.CurModel = ""
 VDInventory.CurPrice = 0
-local filled = circles.New(CIRCLE_FILLED, 150, 155, 155)
 local LNBuyText = "text"
 local menuOpen = false
 local modelSet = false
@@ -91,27 +90,29 @@ function VDMenu.showMenu( )
     VDMenu.Frame:MakePopup()
     local countdown = 100
     local eyecountdown = 20
-    
-
+    local rotatecos = 0
+    local randmath = 0
 
 
     ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
-    local VDSit = vgui.Create( "DModelPanel", VDMenu.Frame )
-        VDSit:SetSize( ScrH()/6, ScrW()/10.666)
-        xz,yz = VDSit:GetSize()
-        VDSit:SetPos((ScrW() / 2) - xz/2.05, (ScrH() / 2) - yz/1.5)
-        VDSit:SetModel( "models/vector_orc.mdl" ) -- you can only change colors on playermodels
-        function VDSit:LayoutEntity( Entity ) return end
     
     VDMenu.Frame.Paint = function()
-        function VDSit.Entity:GetPlayerColor() return Vector ( 1, 0, 0 ) end --we need to set it to a Vector not a Color, so the values are normal RGB values divided by 255.
-        eyecountdown = Lerp(FrameTime(), eyecountdown, 0 )
-        local eyepos = Vector(0, 0, eyecountdown) + VDSit.Entity:GetBonePosition(VDSit.Entity:LookupBone("ValveBiped.Bip01_Head1"))
-        local mx,my = input.GetCursorPos()
-        VDSit:SetLookAt(eyepos)
-        VDSit:SetCamPos(eyepos-Vector(-20, 0, 0) )-- Move cam in front of eyes
-        VDSit.Entity:SetEyeTarget(Vector(0,mx,my))
         VDMenu.blur( VDMenu.Frame, 10, 20, 255 )
+        draw.NoTexture()
+        if(math.Round(RealTime()) % 6 == 0) then
+            randmath = math.Rand(1,10)
+        end
+        local temprotatecos = (math.sin(RealTime()) * 25 + (math.cos(RealTime()) * 10)) * randmath
+        rotatecos = Lerp(FrameTime(), rotatecos, temprotatecos)
+        print(rotatecos)
+        local outlined = circles.New(CIRCLE_OUTLINED, ScrW() / 2, ScrH() / 2, ScreenScale(23), 2)
+        outlined:Rotate(rotatecos)
+        outlined:SetColor(color_white)
+        outlined:SetStartAngle(15)
+        outlined:SetEndAngle(345)
+        outlined()
+        local outlinedplanet = circles.New(CIRCLE_OUTLINED, ScrW() / 2, ScrH() / 2, ScreenScale(25), 3)
+
 
     ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
 
@@ -125,7 +126,6 @@ function VDMenu.showMenu( )
         surface.SetDrawColor( 50, 50, 50, 150 )
         surface.DrawRect( 0, 0, VDMenu.Frame:GetWide(), VDMenu.Frame:GetTall() )
         surface.SetDrawColor( 200, 200, 200, 255 )
-        filled()
         --surface.DrawLine(((ScrW() / 2) - xz/2.05) + xz,((ScrH() / 2) - yz/1.5) + yz,((ScrW() / 2) - xz/2.05) + xz,((ScrH() / 2) - yz/1.5) + yz)
         if VDInventory.numberOfItems > 1 then
             countdown = Lerp(FrameTime(), countdown, 0 )
