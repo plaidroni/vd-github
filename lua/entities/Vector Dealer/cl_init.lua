@@ -1,5 +1,5 @@
 include("shared.lua")
-
+local circles = include("circles.lua")
 
 surface.CreateFont("LividityTEXT", {
     font = "Roboto",
@@ -48,7 +48,8 @@ VDInventory.numberOfItems = #VDInventory.Items
 VDInventory.CurName = ""
 VDInventory.CurModel = ""
 VDInventory.CurPrice = 0
-LNBuyText = "text"
+local filled = circles.New(CIRCLE_FILLED, 150, 155, 155)
+local LNBuyText = "text"
 local menuOpen = false
 local modelSet = false
 local clickedItem = 0
@@ -124,7 +125,7 @@ function VDMenu.showMenu( )
         surface.SetDrawColor( 50, 50, 50, 150 )
         surface.DrawRect( 0, 0, VDMenu.Frame:GetWide(), VDMenu.Frame:GetTall() )
         surface.SetDrawColor( 200, 200, 200, 255 )
-
+        filled()
         --surface.DrawLine(((ScrW() / 2) - xz/2.05) + xz,((ScrH() / 2) - yz/1.5) + yz,((ScrW() / 2) - xz/2.05) + xz,((ScrH() / 2) - yz/1.5) + yz)
         if VDInventory.numberOfItems > 1 then
             countdown = Lerp(FrameTime(), countdown, 0 )
