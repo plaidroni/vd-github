@@ -85,7 +85,7 @@ function ENT:Use( Name )
             local minamt = tonumber(sql.QueryValue("SELECT Money FROM VDMinAmt;"))
             local x,y,z  = Name:GetPos():Unpack()
             local z = z + 60
-             
+            
             ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
             ParticleEffect( "generic_smoke", Vector(x,y,z) , Angle( 0, 0, 0 ) )
                      
