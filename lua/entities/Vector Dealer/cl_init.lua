@@ -104,15 +104,17 @@ function VDMenu.showMenu( )
         end
         local temprotatecos = (math.sin(RealTime()) * 25 + (math.cos(RealTime()) * 10)) * randmath
         rotatecos = Lerp(FrameTime(), rotatecos, temprotatecos)
-        print(rotatecos)
         local outlined = circles.New(CIRCLE_OUTLINED, ScrW() / 2, ScrH() / 2, ScreenScale(23), 2)
         outlined:Rotate(rotatecos)
         outlined:SetColor(color_white)
         outlined:SetStartAngle(15)
         outlined:SetEndAngle(345)
         outlined()
+        print(Vector(2,0,0))
+        local pos = Vector(ScrW() / 2, ScrH() / 2, 0)
         local outlinedplanet = circles.New(CIRCLE_OUTLINED, ScrW() / 2, ScrH() / 2, ScreenScale(25), 3)
-
+        local outlinedplanetexo = circles.New(CIRCLE_OUTLINED, ScrW() / 2, ScrH() / 2, ScreenScale(25), 3)
+        outlinedplanetexo()
 
     ------------------------------MODEL OF THE GUY IN THE MIDDLE-------------------------------------
 
