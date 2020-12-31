@@ -1,5 +1,5 @@
 # Vector Dealer
-![alt text](https://imgur.com/a/1O8agaF)
+![alt text](https://i.imgur.com/WouQCyG.png)
 
 This is a Garry's Mod extention which implements a new shop npc named the Vector Dealer. The Vector Dealer can be fully modulated by the administrator of the server through a plethora of the commands. This mod also introduces a new notification system that plays into a cat and mouse game for currency exclusively used by the Vector Dealer.
 
@@ -9,7 +9,7 @@ The Vector Dealer is a new way to add depth to your server and give players a re
 
 The Dealer appears at random intervals at selected locations to sell players, exclusive, exotic, and powerful items. This is not meant to replace your normal Black Market Dealer jobs, but rather give the top tier items the rarity they deserve, and make them feel that much more special and powerful. It also helps to alleviate the self-supplying of the best weapons and tools that plagues DarkRP servers.
 
-![alt text](https://imgur.com/a/iMaIQli)
+![alt text](https://i.imgur.com/ipLbaQf.png)
 
 FEATURES
 The Vector Dealer has many features, including,
@@ -24,7 +24,7 @@ The Vector Dealer has many features, including,
 
 -In-game changeable config
 
-![alt text](https://imgur.com/a/ylrV1tS)
+![alt text](https://i.imgur.com/EA1Tx4V.png)
 
 Changing the Vector Dealer is easy to do, and you can change just about everything about him, including
 
@@ -36,7 +36,7 @@ Changing the Vector Dealer is easy to do, and you can change just about everythi
 
 -The spawn time intervals
 
-![alt text](https://imgur.com/a/i3JjWLw)
+![alt text](https://i.imgur.com/AbDjZ9e.png)
 
 QUICK START GUIDE
 All of this information can be accessed in-game by typing "VDHelp" into the console
